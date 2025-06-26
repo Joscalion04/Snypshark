@@ -1,22 +1,90 @@
-# Entorno virtual de Python
-venv/
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Archivos de entorno virtual (alternativos para algunos sistemas)
+# Virtual environment
+venv/
 .env/
 .venv/
 env/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
 
-# Byte-compiled / optimized / DLL files
-analisis/__pycache__/
-*.py[cod]
-*$py.class
-
-# Archivos de configuración de IDEs
+# IDE specific files
 .vscode/
 .idea/
-
-# Archivos temporales y de sistema
 *.swp
 *.swo
+*.sublime-workspace
+*.sublime-project
+
+# System files
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.lnk
+
+# Logs and databases
+*.log
+*.sqlite
+*.sqlite3
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+test-results/
+
+# Project specific
+data/output/
+data/processed/
+data/raw/
+*.pcap
+*.pcapng
+
+# Secrets and sensitive data
+*.key
+*.pem
+*.cert
+*.secret
+secrets.ini
+credentials.json
+.env.local
+.env.*.local
+
+# Documentation
+docs/_build/
+_site/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/settings.json
+.vscode/launch.json
