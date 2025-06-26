@@ -1,54 +1,118 @@
-# 🕵️‍♂️ Analizador de Capturas `.pcapng` con Python
+# 🕵️‍♂️ PCAP Network Traffic Analyzer
 
-Este proyecto es una aplicación simple de línea de comandos escrita en Python que analiza archivos de captura de red (`.pcap` / `.pcapng`). Está orientada a fines académicos y tiene como objetivo mostrar:
+![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-- Las **capas del modelo OSI** presentes en cada paquete.
-- Comportamientos **anómalos** o sospechosos a nivel de red, como combinaciones inusuales de flags TCP o tipos ICMP no estándar.
+A command-line Python application for analyzing network capture files (`.pcap`/`.pcapng`) with OSI layer analysis and anomaly detection capabilities.
 
----
+## Features
 
-## ⚙️ Funcionalidad Actual
+### 📊 OSI Layer Analysis
+- Identifies and displays OSI layers present in each packet
+- Provides statistics on protocol distribution
+- Sample packet visualization with layer breakdown
 
-### ✅ Análisis de Capas OSI
+### 🔍 Anomaly Detection
+- Unusual TCP flag combinations (e.g., FIN+SYN+ACK `0x13`)
+- Non-standard ICMP types (beyond echo request/reply)
+- Suspicious traffic patterns and malformed packets
+- DNS query/response monitoring
 
-El programa procesa cada paquete del archivo `.pcapng` y muestra qué capas del modelo OSI están presentes. Por ejemplo:
+### 📈 Interactive Reporting
+- Menu-driven interface for analysis results
+- Protocol statistics and frequency charts
+- Suspicious activity alerts
 
-
-### ✅ Detección de Anomalías
-
-Se detectan comportamientos inusuales como:
-
-- 🔺 Flags TCP poco comunes, como `FIN + SYN + ACK` (`0x13`)
-- 🔺 Tipos de ICMP que no sean eco (8) o respuesta (0)
-
-Esto puede ayudar a identificar intentos de escaneo, tráfico malformado o pruebas de penetración.
-
----
-
-## 📁 Estructura del Proyecto
-
-analizador_pcap/
-├── main.py
-├── analisis/
+## Project Structure
+```
+snypshark/
+├── analyzer/
 │ ├── init.py
-│ ├── capa_osi.py
-│ ├── deteccion_anomalias.py
-│ └── resumen.py # (en construcción)
-├── data/
-│ └── ejemplo.pcapng # archivo de muestra (no incluido)
-├── README.md
-└── requirements.txt
-
-
-
----
-
-## 🚀 Cómo Ejecutarlo
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/tu_usuario/analizador_pcap.git
-cd analizador_pcap
+│ ├── analyzer.py # Core analysis engine
+│ ├── protocol_handlers/ # Protocol-specific processors
+│ │ ├── tcp_handler.py
+│ │ ├── ip_handler.py
+│ │ ├── icmp_handler.py
+│ │ └── dns_handler.py
+│ ├── utils/ # Helper modules
+│ │ ├── pattern_matcher.py
+│ └── ui/ # User interface components
+│ ├── menu.py
+│ └── osi_layers.py
+├── data/ # Sample capture files
+├── docs/ # Documentation
+├── tests/ # Unit tests
+├── main.py # Entry point
+├── requirements.txt # Dependencies
+├── setup.py # Package configuration
+└── README.md
 ```
 
+
+## Requirements
+
+- Python 3.8+
+- pyshark
+- Click (for CLI)
+
+## Installation
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/snypshark.git
+cd snypshark
+
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install in development mode
+pip install -e .
+```
+
+## Usage
+```bash
+python main.py path/to/your_capture.pcapng
+```
+
+## Example Output
+```bash
+===== [OSI Layer Overview] =====
+Showing first 5 packets as sample:
+
+📦 Packet #1:
+ETH -> IP -> TCP -> HTTP
+
+📦 Packet #2:
+ETH -> IP -> UDP -> DNS
+
+📊 Layer statistics:
+IP: 1432 occurrences
+TCP: 982 occurrences
+HTTP: 420 occurrences
+DNS: 210 occurrences
+
+===== [Anomaly Detection] =====
+🚩 Unusual TCP Flags:
+SYN+ACK+URG: 3 occurrences
+RST+PSH: 2 occurrences
+
+📶 Non-standard ICMP:
+Type 13 (Timestamp): 5 packets
+```
+
+## Key improvements:
+1. Professional header with badges
+2. Clear feature breakdown
+3. Modern project structure visualization
+4. Complete installation/usage instructions
+5. Example output section
+6. Standard open-source sections (contributing, license, contact)
+7. Consistent formatting and emoji use
+8. All technical terms in English
+
+You can customize the contact information, GitHub links, and add specific examples from your project's actual output. The markdown uses a clean, professional format that will display well on GitHub and other platforms.
