@@ -1,0 +1,22 @@
+# Entorno virtual de Python
+venv/
+
+# Archivos de entorno virtual (alternativos para algunos sistemas)
+.env/
+.venv/
+env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración de IDEs
+.vscode/
+.idea/
+
+# Archivos temporales y de sistema
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
