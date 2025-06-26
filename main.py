@@ -1,33 +1,53 @@
-from analisis.capa_osi import analizar_capas_osi
-from analisis.deteccion_anomalias import PcapAnalyzer
-from analisis.resumen import mostrar_menu_interactivo
+from analyzer.analyzer import PCAPAnalyzer
+from analyzer.protocol_handlers.tcp_handler import TCPProcessor
+from analyzer.protocol_handlers.ip_handler import IPProcessor
+from analyzer.protocol_handlers.icmp_handler import ICMPProcessor
+from analyzer.protocol_handlers.dns_handler import DNSProcessor
+from analyzer.utils.pattern_matcher import PatternMatcher
+from analyzer.ui.menu import InteractiveMenu
+from analyzer.ui.osi_layers import OSILayerAnalyzer
+
 import time
 
 def main():
     try:
-        archivo = input("📂 Ingrese la ruta del archivo .pcap/.pcapng: ").strip()
+        file_path = input("📂 Enter path to .pcap/.pcapng file: ").strip()
         
-        print("\n🔍 Analizando archivo... (esto puede tomar tiempo)")
+        print("\n🔍 Analyzing file... (this may take time)")
         start_time = time.time()
         
-        # Análisis de capas OSI (muestra solo primeros paquetes para vista general)
-        print("\n===== [Vista General de Capas] =====")
-        analizar_capas_osi(archivo, muestra=5)
+        # OSI Layer Analysis (quick overview)
+        print("\n===== [OSI Layer Overview] =====")
+        OSILayerAnalyzer.analyze(file_path, sample_size=5)
         
-        # Análisis completo
-        analizador = PcapAnalyzer(archivo)
-        analizador.analizar()
+        # Full analysis
+        analyzer = PCAPAnalyzer(file_path)
         
-        print(f"\n⏱️ Tiempo de análisis: {time.time() - start_time:.2f} segundos")
+        # Register processors (Dependency Injection)
+        processors = {
+            'tcp': TCPProcessor(),
+            'ip': IPProcessor(),
+            'icmp': ICMPProcessor(),
+            'dns': DNSProcessor(),
+            'patterns': PatternMatcher()
+        }
         
-        # Menú interactivo
-        print("\n===== [Resumen Interactivo] =====")
-        mostrar_menu_interactivo(analizador)
+        for processor in processors.values():
+            analyzer.add_processor(processor)
+        
+        analyzer.analyze()
+        
+        print(f"\n⏱️ Analysis time: {time.time() - start_time:.2f} seconds")
+        
+        # Interactive menu
+        print("\n===== [Interactive Analysis] =====")
+        menu = InteractiveMenu(analyzer, processors)
+        menu.display_menu()
         
     except FileNotFoundError:
-        print("❌ Error: Archivo no encontrado")
+        print("❌ Error: File not found")
     except Exception as e:
-        print(f"❌ Error inesperado: {str(e)}")
+        print(f"❌ Unexpected error: {str(e)}")
 
 if __name__ == "__main__":
     main()
