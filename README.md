@@ -59,7 +59,7 @@ snypshark/
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/snypshark.git
+git clone https://github.com/joscalion04/snypshark.git
 cd snypshark
 
 # Create virtual environment (recommended)
