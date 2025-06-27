@@ -115,4 +115,5 @@ Type 13 (Timestamp): 5 packets
 7. Consistent formatting and emoji use
 8. All technical terms in English
 
-You can customize the contact information, GitHub links, and add specific examples from your project's actual output. The markdown uses a clean, professional format that will display well on GitHub and other platforms.
+## Author:
+ - Joseph Leon (Joscalion04)
