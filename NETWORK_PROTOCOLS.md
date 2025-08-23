@@ -1,4 +1,4 @@
-# Network Protocols Capturable in Wireshark – Professional Table
+# Network Protocols Capturable in Wireshark
 
 | OSI Layer | Protocol | Meaning | Purpose | Function | Transported PDU | How it Works | Threats / Security Controls |
 |----------|-----------|--------|--------|---------|----------------|-------------|---------------------------|
