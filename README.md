@@ -115,5 +115,8 @@ Type 13 (Timestamp): 5 packets
 7. Consistent formatting and emoji use
 8. All technical terms in English
 
+## Wiki
+ - https://deepwiki.com/Joscalion04/Snypshark
+
 ## Author:
  - Joseph Leon (Joscalion04)
