@@ -3,165 +3,279 @@
 <div align="center">
   <img src="assets/logo_2.png" alt="Logo" width="200"/>
 </div>
-
-
+<div align="center">
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Version](https://img.shields.io/badge/version-0.0.2-orange.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
 
-Snypshark is a **command-line Python application** for analyzing network capture files (`.pcap` / `.pcapng`). It provides **OSI layer analysis**, **anomaly detection**, and plans for **advanced data analytics** and **visual dashboards**.
+</div>
 
----
+## 🌟 Features
 
-## Features
+### 📊 Advanced Data Analysis with Pandas
+- **Structured Data Processing**: Convert raw packet data into organized DataFrames
+- **Statistical Analysis**: Comprehensive traffic statistics and protocol distribution
+- **Time Series Analysis**: Temporal pattern recognition and traffic timeline
+- **Excel Export**: Generate professional reports in XLSX format
+- **JSON Reports**: Structured data export for integration with other tools
 
-### 📊 OSI Layer Analysis
-- Detects and displays OSI layers for each packet (Ethernet, IP, TCP/UDP, ICMP, DNS, HTTP, HTTPS, ARP, DHCP, etc.)
-- Provides statistics on protocol distribution across the capture
-- Visualizes sample packets with hierarchical layer breakdowns
-- Future support: pandas-based analysis for **data aggregation, filtering, and trends**
+### 🔍 Enhanced Security Detection
+- **Port Scan Detection**: Automatic identification of suspicious scanning activity
+- **Anomaly Detection**: Machine-learning ready anomaly scoring system
+- **Pattern Matching**: Custom regex patterns for threat hunting
+- **Top Talkers Analysis**: Identify heaviest traffic generators
+- **Protocol Violation Detection**: Flag non-standard protocol usage
 
-### 🔍 Anomaly Detection
-- Identifies unusual TCP flag combinations (e.g., FIN+SYN+ACK `0x13`)
-- Detects non-standard ICMP types (beyond echo request/reply)
-- Flags suspicious traffic patterns and malformed packets
-- Monitors DNS queries/responses for anomalies
-- Future support: Machine-learning-friendly output for anomaly scoring
+### 🎯 Comprehensive Protocol Support
+- **Layer 2-7 Analysis**: Full OSI model coverage
+- **TCP/UDP Analysis**: Deep packet inspection with flag analysis
+- **DNS Monitoring**: Query/response correlation and suspicious domain detection
+- **HTTP Analysis**: Method tracking, host analysis, and user agent monitoring
+- **ICMP Typing**: Comprehensive ICMP type and code analysis
+- **IP Statistics**: TTL analysis, fragmentation monitoring, and hop limit tracking
 
-### 📈 Interactive Reporting
-- Menu-driven interface for navigating analysis results
-- Protocol frequency charts
-- Alerts for suspicious activity
-- Future support: HTML dashboard generation with **interactive charts and tables**, fully translatable
+### 💻 Beautiful User Interface
+- **Interactive CLI Menu**: Intuitive navigation with categorized options
+- **Real-time Progress Bars**: Visual feedback during analysis
+- **Color-coded Output**: Enhanced readability with emoji indicators
+- **Clear Screen Management**: Professional terminal experience
+- **Export Wizard**: Guided report generation process
 
-### 🌐 Protocol Coverage
-Currently supports:
-- **Ethernet**: Layer 2 encapsulation
-- **ARP**: Address resolution detection
-- **IPv4 / IPv6**
-- **TCP / UDP**
-- **ICMP**: Echo request/reply, type/code validation
-- **DNS**: Query/response, suspicious patterns
-- **HTTP / HTTPS**
-- **DHCP**: Lease monitoring
-- Other protocols can be added via `protocol_handlers/`
+## 📦 Installation
 
----
+### Prerequisites
+- Python 3.8 or higher
+- 4GB RAM minimum (8GB recommended for large captures)
+- 500MB disk space
 
-## Project Structure
-```
-snypshark/
-├── analyzer/
-│ ├── init.py
-│ ├── analyzer.py # Core analysis engine
-│ ├── protocol_handlers/ # Protocol-specific processing modules
-│ │ ├── tcp_handler.py
-│ │ ├── ip_handler.py
-│ │ ├── icmp_handler.py
-│ │ ├── dns_handler.py
-│ │ └── ...
-│ ├── utils/ # Helper utilities
-│ │ ├── pattern_matcher.py
-│ │ └── ...
-│ └── ui/ # CLI interface modules
-│ ├── menu.py
-│ └── osi_layers.py
-├── data/ # Sample PCAP files for testing
-├── docs/ # Project documentation
-├── tests/ # Unit tests
-├── main.py # CLI entry point
-├── requirements.txt # Python dependencies
-├── setup.py # Package configuration
-└── README.md
-```
-
-## Requirements
-
-- Python 3.8+
-- [pyshark](https://github.com/KimiNewt/pyshark)
-- [Click](https://click.palletsprojects.com/) (CLI)
-- Future: pandas, matplotlib/plotly for enhanced analytics
-
----
-
-## Installation
-
+### Quick Install
 ```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/joscalion04/snypshark.git
 cd snypshark
 
 # Create virtual environment (recommended)
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
+# or
 venv\Scripts\activate     # Windows
 
-# Install dependencies
+# Install with pip
 pip install -r requirements.txt
 
-# Install in development mode
+# Install in development mode (optional)
 pip install -e .
 ```
 
-## Usage
+### Development Installation
 ```bash
-python main.py path/to/your_capture.pcapng
+# For contributors and advanced users
+pip install -r requirements-dev.txt
+
+# Set up pre-commit hooks
+pre-commit install
 ```
 
-## Example Output
+## 🚀 Usage
+
+### Basic Analysis
 ```bash
-===== [OSI Layer Overview] =====
-Showing first 5 packets as sample:
+python main.py
+```
+Follow the interactive prompts to select your PCAP file and analysis options.
 
-📦 Packet #1:
-ETH -> IP -> TCP -> HTTP
+### Example Workflow
+1. **Launch the application**
+2. **Drag and drop** your PCAP file when prompted
+3. **View OSI layer overview** for quick insights
+4. **Monitor real-time progress** during analysis
+5. **Explore results** through interactive menus
+6. **Export findings** to Excel or JSON formats
 
-📦 Packet #2:
-ETH -> IP -> UDP -> DNS
+## 📊 Sample Output
 
-📊 Layer statistics:
-IP: 1432 occurrences
-TCP: 982 occurrences
-HTTP: 420 occurrences
-DNS: 210 occurrences
+```bash
+════════════════════════════════════════════════════════════════
+🎮 MAIN ANALYSIS MENU
+════════════════════════════════════════════════════════════════
+1. 📦 Packet Statistics
+2. 🌐 Protocol Analysis
+3. 🔍 Security Findings
+4. 📊 Advanced Pandas Analysis
+5. 💾 Export Results
+0. 🚪 Exit
+════════════════════════════════════════════════════════════════
 
-===== [Anomaly Detection] =====
-🚩 Unusual TCP Flags:
-SYN+ACK+URG: 3 occurrences
-RST+PSH: 2 occurrences
-
-📶 Non-standard ICMP:
-Type 13 (Timestamp): 5 packets
+🎯 Select an option (0-5): 4
 ```
 
-## Key improvements:
-1. Professional header with badges
-2. Clear feature breakdown
-3. Modern project structure visualization
-4. Complete installation/usage instructions
-5. Example output section
-6. Standard open-source sections (contributing, license, contact)
-7. Consistent formatting
-8. All technical terms in English
+## 🏗️ Project Structure
 
-## Roadmap / Future Enhancements
-- Expanded protocol coverage (ARP, DHCP, HTTP/HTTPS, TLS, etc.)
-- Data analytics with pandas for filtering, aggregation, and time-series analysis
-- Graphical reporting using matplotlib or plotly
-- Static HTML dashboard generation for shareable reports
-- User-configurable alert rules for anomalies
-- Localization for multi-language support
+```
+snypshark/
+├── analyzer/
+│   ├── __init__.py
+│   ├── analyzer.py              # Core analysis engine
+│   ├── data_analysis/      
+│   |   └── pandas_analyzer.py       # Advanced data analysis
+│   ├── protocol_handlers/       # Protocol-specific processors
+│   │   ├── tcp_handler.py
+│   │   ├── udp_handler.py
+│   │   ├── ip_handler.py
+│   │   ├── icmp_handler.py
+│   │   ├── dns_handler.py
+│   │   ├── http_handler.py
+│   │   └── dhcp_handler.py
+│   ├── utils/                   # Utility modules
+│   │   ├── pattern_matcher.py
+│   │   ├── progress.py
+│   │   └── __init__.py
+│   └── ui/                      # User interface
+│       ├── menu.py
+│       ├── osi_layers.py
+│       └── __init__.py
+├── data/                        # Sample PCAP files
+├── tests/                       # Test suite
+├── main.py                      # CLI entry point
+├── requirements.txt             # Production dependencies
+├── requirements-dev.txt         # Development dependencies
+├── setup.py                     # Package configuration
+└── README.md                    # This file
+```
 
-## Contributing
-- Contributions are welcome!
-- Fork the repository
-- Create a feature branch (git checkout -b feature/my-feature)
-- Commit changes (git commit -m 'Add feature')
-- Push to branch (git push origin feature/my-feature)
-- Open a Pull Request
+## 🔧 Dependencies
 
-## Wiki
- - https://deepwiki.com/Joscalion04/Snypshark
+### Core Dependencies
+```txt
+pyshark>=0.5.0          # PCAP file parsing
+pandas>=1.5.0           # Data analysis and manipulation
+numpy>=1.24.0           # Numerical computing
+openpyxl>=3.1.0         # Excel export functionality
+colorama>=0.4.0         # Terminal color support
+python-dateutil>=2.8.0  # Date and time handling
+```
 
-## Author:
- - Joseph Leon (Joscalion04)
+### Development Dependencies
+```txt
+pytest>=7.0.0           # Testing framework
+pytest-cov>=4.0.0       # Test coverage reporting
+pytest-mock>=3.10.0     # Mocking for tests
+black>=23.0.0           # Code formatting
+flake8>=6.0.0           # Code linting
+isort>=5.12.0           import sorting
+mypy>=1.0.0             # Static type checking
+pre-commit>=3.0.0       # Git pre-commit hooks
+```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=analyzer
+
+# Run specific test module
+pytest tests/test_analyzer.py -v
+```
+
+## 📋 Supported Analysis Types
+
+### Protocol Analysis
+- **TCP**: Flag analysis, stream tracking, port statistics
+- **UDP**: Port distribution, packet size analysis
+- **IP**: TTL analysis, fragmentation, protocol distribution
+- **ICMP**: Type/code analysis, error message tracking
+- **DNS**: Query/response correlation, domain analysis
+- **HTTP**: Method analysis, host tracking, status codes
+- **DHCP**: Message type analysis, lease monitoring
+
+### Security Analysis
+- **Port Scan Detection**: SYN flood and stealth scan identification
+- **Anomaly Detection**: Statistical outlier detection
+- **Pattern Matching**: Custom regex pattern matching
+- **Behavior Analysis**: Traffic baseline deviation
+
+### Data Analysis
+- **Time Series**: Traffic patterns over time
+- **Top N Analysis**: Top talkers, protocols, ports
+- **Statistical Summary**: Mean, median, standard deviation
+- **Correlation Analysis**: Protocol and service relationships
+
+## 🎨 UI Features
+
+- **Interactive Menus**: Categorized navigation system
+- **Real-time Progress**: Animated progress bars with ETA
+- **Color Coding**: Visual distinction of information types
+- **Clear Screen Management**: Professional terminal experience
+- **Contextual Help**: In-line guidance and tooltips
+
+## 📁 Export Capabilities
+
+### Excel Export
+- Multiple worksheets with detailed analysis
+- Formatted tables and charts-ready data
+- Professional styling and branding
+- Automated report generation
+
+### JSON Export
+- Machine-readable format
+- Integration with other security tools
+- Structured data for further processing
+- Complete analysis results preservation
+
+## 🔮 Roadmap
+
+### Short-term Goals
+- [ ] Real-time network capture support
+- [ ] Enhanced visualization capabilities
+- [ ] Custom rule engine for threat detection
+- [ ] Integration with threat intelligence feeds
+
+### Long-term Vision
+- [ ] Machine learning anomaly detection
+- [ ] Cloud-based analysis platform
+- [ ] Mobile application companion
+- [ ] API for automated analysis
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- 📖 [Documentation Wiki](https://deepwiki.com/Joscalion04/Snypshark)
+- 🐛 [Issue Tracker](https://github.com/joscalion04/snypshark/issues)
+- 💬 [Discussions](https://github.com/joscalion04/snypshark/discussions)
+- 📧 Email: joscalion04@gmail.com
+
+## 👥 Authors
+
+- **Joseph Leon (Joscalion04)** - Initial work and maintenance
+
+## 🙏 Acknowledgments
+
+- Inspired by Wireshark and network forensic tools
+- Built with amazing open-source Python libraries
+- Community contributors and testers
+
+---
+
+<div align="center">
+
+**Happy hunting!** 🕵️‍♂️✨
+
+</div>
