@@ -4,8 +4,6 @@
   <img src="assets/logo_2.png" alt="Logo" width="200"/>
 </div>
 
-
-
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
