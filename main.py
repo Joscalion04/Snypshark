@@ -17,6 +17,7 @@ import os
 import sys
 import json
 from pathlib import Path
+import multiprocessing
 
 def print_banner():
     """Muestra un banner atractivo"""
@@ -66,13 +67,48 @@ def get_file_path():
         
         return file_path
 
+def get_optimal_workers(file_size_mb):
+    """Determina el número óptimo de workers basado en el tamaño del archivo"""
+    cpu_count = multiprocessing.cpu_count()
+    
+    if file_size_mb < 10:    # < 10 MB
+        return min(2, cpu_count)
+    elif file_size_mb < 100: # < 100 MB
+        return min(4, cpu_count)
+    elif file_size_mb < 500: # < 500 MB
+        return min(8, cpu_count)
+    else:                    # > 500 MB
+        return min(12, cpu_count)
+
+def optimize_memory_settings():
+    """Optimiza la configuración de memoria para mejor rendimiento"""
+    import gc
+    gc.set_threshold(70000, 10, 10)  # Configurar garbage collector
+    
+    # Pre-cargar bibliotecas comunes
+    try:
+        import numpy as np
+        np.zeros(1)  # Pre-cargar numpy
+    except ImportError:
+        pass
+
 def analyze_file(file_path):
-    """Realiza el análisis del archivo con interfaz mejorada"""
+    """Realiza el análisis del archivo con interfaz mejorada y paralelización"""
     print("\n🔍 STARTING ANALYSIS")
     print("═" * 50)
     
-    # Pre-conteo para barra de progreso
-    print("⏳ Counting packets...")
+    # Optimizar configuración de memoria
+    optimize_memory_settings()
+    
+    # Determinar configuración óptima
+    file_size = os.path.getsize(file_path) / (1024 * 1024)  # MB
+    max_workers = get_optimal_workers(file_size)
+    
+    print(f"⚡ Performance mode: {max_workers} workers")
+    print(f"📊 File size: {file_size:.2f} MB")
+    
+    # Pre-conteo rápido
+    print("⏳ Counting packets (fast method)...")
     total_packets = PCAPAnalyzer.count_packets(file_path)
     
     if total_packets == 0:
@@ -81,15 +117,18 @@ def analyze_file(file_path):
     
     print(f"📦 Total packets to analyze: {total_packets:,}")
     
-    # Overview OSI
-    print("\n🌐 OSI LAYER OVERVIEW")
-    print("─" * 30)
-    OSILayerAnalyzer.analyze(file_path, sample_size=3)
+    # Overview OSI (muestra solo para archivos pequeños)
+    if total_packets < 10000:
+        print("\n🌐 OSI LAYER OVERVIEW")
+        print("─" * 30)
+        OSILayerAnalyzer.analyze(file_path, sample_size=3)
+    else:
+        print("\n⏩ Skipping OSI overview for large file...")
     
     # Inicializar analyzer
     analyzer = PCAPAnalyzer(file_path)
     
-    # Registrar procesadores
+    # Registrar procesadores optimizados
     processors = {
         'tcp': TCPProcessor(),
         'ip': IPProcessor(),
@@ -107,30 +146,49 @@ def analyze_file(file_path):
         print(f"✅ Loaded {name.upper()} processor")
     
     # Barra de progreso con estilo mejorado
-    print(f"\n🚀 Analyzing {total_packets:,} packets...")
+    print(f"\n🚀 Analyzing {total_packets:,} packets with {max_workers} workers...")
     bar = ProgressBar(total=total_packets, length=40, prefix="Progress")
     
     start_time = time.time()
-    analyzer.analyze(progress_callback=bar.update)
+    
+    # Análisis paralelo optimizado
+    analyzer.analyze(
+        progress_callback=bar.update,
+        max_workers=max_workers
+    )
+    
     bar.finish()
     
     elapsed = time.time() - start_time
     print(f"⏱️  Analysis completed in {elapsed:.2f} seconds")
-    print(f"📊 Processing speed: {total_packets/elapsed:.0f} packets/second")
     
-    # Construir DataFrames de pandas
-    print("\n📈 BUILDING ADVANCED ANALYSIS")
-    print("─" * 30)
-    pandas_analyzer = processors['pandas']
-    pandas_analyzer.build_dataframes()
+    if elapsed > 0:
+        speed = total_packets / elapsed
+        print(f"🚀 Processing speed: {speed:.0f} packets/second")
+        print(f"📈 Throughput: {(file_size / elapsed):.2f} MB/s")
     
-    # Mostrar resumen rápido
-    _show_pandas_summary(pandas_analyzer)
+    # Construir DataFrames de pandas (solo si es necesario)
+    use_pandas = input("\n📊 Enable advanced pandas analysis? (y/N): ").strip().lower() == 'y'
+    
+    if use_pandas:
+        print("\n📈 BUILDING ADVANCED ANALYSIS")
+        print("─" * 30)
+        pandas_analyzer = processors['pandas']
+        pandas_analyzer.build_dataframes()
+        
+        # Mostrar resumen rápido
+        _show_pandas_summary(pandas_analyzer)
+    else:
+        pandas_analyzer = None
+        print("⏩ Skipping pandas analysis...")
     
     return analyzer, processors, pandas_analyzer
 
 def _show_pandas_summary(pandas_analyzer):
     """Muestra un resumen rápido del análisis con pandas"""
+    if not pandas_analyzer:
+        return
+        
     report = pandas_analyzer.generate_security_report()
     
     print("\n" + "═" * 60)
@@ -181,6 +239,8 @@ def main():
         print("👋 Goodbye!")
     except Exception as e:
         print(f"\n❌ Unexpected error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         print("💡 Please check if the file is a valid PCAP capture")
     finally:
         print("\n" + "═" * 60)
