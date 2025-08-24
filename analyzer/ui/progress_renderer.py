@@ -47,3 +47,25 @@ class ProgressBar:
         
         sys.stdout.write(msg)
         sys.stdout.flush()
+
+class MultiProgressBar:
+    """Múltiples barras de progreso para operaciones paralelas"""
+    
+    def __init__(self, num_bars: int, total: int, prefixes: list = None):
+        self.num_bars = num_bars
+        self.totals = [total] * num_bars
+        self.currents = [0] * num_bars
+        self.bars = []
+        
+        for i in range(num_bars):
+            prefix = prefixes[i] if prefixes and i < len(prefixes) else f"Worker {i+1}"
+            self.bars.append(ProgressBar(total, 20, prefix))
+    
+    def update(self, bar_index: int, value: int) -> None:
+        if 0 <= bar_index < self.num_bars:
+            self.currents[bar_index] = value
+            self.bars[bar_index].update(value)
+    
+    def finish_all(self) -> None:
+        for bar in self.bars:
+            bar.finish()

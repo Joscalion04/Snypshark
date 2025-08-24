@@ -1,15 +1,18 @@
 from typing import Any, Dict, Optional
 import json
+import os
 from collections import Counter
-import os  # Importación añadida
+
+from analytics.pandas_analyzer import PandasAnalyzer
+from utils.file_utils import validate_file_path
 
 class InteractiveMenu:
-    """
-    UI de consola mejorada con mejor estética y organización
-    """
+    """Sistema de menú interactivo mejorado y corregido"""
+    
     def __init__(self, analyzer, processors):
         self.analyzer = analyzer
         self.processors = processors
+        self.current_menu = "main"
 
     def _print_header(self, title: str):
         """Imprime un encabezado bonito"""
@@ -54,7 +57,7 @@ class InteractiveMenu:
             '3': ("🔍 Security Findings", self._security_menu),
             '4': ("📊 Advanced Pandas Analysis", self._pandas_submenu),
             '5': ("💾 Export Results", self._export_menu),
-            '0': ("🚪 Exit", None),
+            '0': ("🚪 Exit", self._exit_program),
         }
 
         while True:
@@ -83,7 +86,7 @@ class InteractiveMenu:
                 result = action[1]()
                 if result is not None:
                     print(f"\n{result}")
-                input("\n⏎ Press Enter to continue...")
+                input("\n⏎ Press Enter to return to main menu...")
             except Exception as e:
                 print(f"\n❌ Error: {str(e)}")
                 input("⏎ Press Enter to continue...")
@@ -97,7 +100,7 @@ class InteractiveMenu:
             '2': ("Protocol distribution", self._get_common_protocols),
             '3': ("Source IPs", self._get_source_ips),
             '4': ("TTL analysis", self._get_ttls),
-            '5': ("Back", None)
+            '5': ("Back to main menu", None)
         }
         
         return self._run_submenu(options, "📊 Packet Statistics")
@@ -112,7 +115,7 @@ class InteractiveMenu:
             '3': ("DNS Analysis", self._dns_submenu),
             '4': ("HTTP Analysis", self._http_submenu),
             '5': ("ICMP Analysis", self._get_icmp_types),
-            '6': ("Back", None)
+            '6': ("Back to main menu", None)
         }
         
         return self._run_submenu(options, "🌐 Protocol Analysis")
@@ -125,7 +128,7 @@ class InteractiveMenu:
             '1': ("Pattern matches", self._get_patterns),
             '2': ("Anomalies detected", self._get_anomalies_summary),
             '3': ("Port scan detection", self._get_port_scan_info),
-            '4': ("Back", None)
+            '4': ("Back to main menu", None)
         }
         
         return self._run_submenu(options, "🔍 Security Findings")
@@ -137,14 +140,15 @@ class InteractiveMenu:
         options = {
             '1': ("Export to Excel", self._export_to_excel),
             '2': ("Generate JSON report", self._export_to_json),
-            '3': ("Back", None)
+            '3': ("Back to main menu", None)
         }
         
         return self._run_submenu(options, "💾 Export Options")
 
     def _run_submenu(self, options, title):
-        """Ejecuta un submenú genérico"""
+        """Ejecuta un submenú genérico CORREGIDO"""
         while True:
+            self._clear_screen()
             self._print_header(title)
             
             for key, (desc, _) in options.items():
@@ -152,23 +156,31 @@ class InteractiveMenu:
             
             choice = input("\n🎯 Select an option: ").strip()
             
-            if choice == str(len(options)):  # Última opción es "Back"
+            # Verificar si es la opción de volver
+            back_option = str(len(options))
+            if choice == back_option:
                 return None
                 
             action = options.get(choice)
             if not action:
-                self._print_error("Invalid option")
+                print("❌ Invalid option. Please try again.")
+                input("⏎ Press Enter to continue...")
                 continue
                 
             if action[1] is None:
                 return None
                 
+            # Ejecutar la acción y mostrar resultados
             result = action[1]()
             if result is not None:
                 print(f"\n{result}")
             
-            input("\n⏎ Press Enter to continue...")
-            return result
+            # Preguntar si quiere continuar en el submenú
+            print("\n" + "─" * 50)
+            cont = input("⏎ Press Enter to continue in this menu, or 'b' to go back: ").strip().lower()
+            
+            if cont == 'b':
+                return result
 
     def _tcp_submenu(self):
         """Submenú de análisis TCP"""
@@ -423,7 +435,7 @@ class InteractiveMenu:
             '5': ("DNS Analysis", lambda: self._pandas_dns_analysis(pandas_analyzer)),
             '6': ("HTTP Analysis", lambda: self._pandas_http_analysis(pandas_analyzer)),
             '7': ("Timeline Analysis", lambda: self._pandas_timeline_analysis(pandas_analyzer)),
-            '8': ("Back", None)
+            '8': ("Back to main menu", None)
         }
         
         return self._run_submenu(options, "📊 Pandas Analysis")
@@ -542,3 +554,9 @@ class InteractiveMenu:
         result += f"Max packets/min: {timeline.get('max_packets_per_minute', 0)}\n"
         result += f"Max bytes/min: {timeline.get('max_bytes_per_minute', 0):,}\n"
         return result
+
+    def _exit_program(self):
+        """Sale del programa"""
+        print("\n👋 Thank you for using Snypshark Analyzer!")
+        print("✨ Happy hunting!")
+        return None

@@ -1,4 +1,4 @@
-from ..analyzer import PacketProcessor
+from core.packet_processor import PacketProcessor
 from collections import Counter
 import threading
 from collections import defaultdict
@@ -13,16 +13,10 @@ class DHCPProcessor(PacketProcessor):
     
     def process_packet(self, packet):
         try:
-            # Verificación rápida de capa bootp (DHCP)
-            layers = packet.layers
-            if not layers:
-                return
-                
-            for layer in layers:
+            for layer in packet.layers:
                 if layer.layer_name == 'bootp':
                     self._process_bootp_layer(packet.bootp)
                     break
-                    
         except (AttributeError, TypeError):
             pass
     
@@ -48,10 +42,11 @@ class DHCPProcessor(PacketProcessor):
         """Devuelve distribución de tipos de mensaje"""
         with self._lock:
             return dict(self._type_cache)
-    
-    def get_dhcp_summary(self):
-        """Devuelve resumen de actividad DHCP"""
+
+    def get_stats(self):
         with self._lock:
-            total = sum(self._type_cache.values())
-            unique = len(self._unique_types)
-            return f"DHCP messages: {total} total, {unique} unique types"
+            return {
+                'total_messages': sum(self._type_cache.values()),
+                'unique_types': len(self._unique_types),
+                'message_distribution': dict(self._type_cache)
+            }

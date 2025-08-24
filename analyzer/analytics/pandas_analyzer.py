@@ -4,8 +4,7 @@ from datetime import datetime
 from collections import defaultdict
 from typing import Dict, List, Optional, Any
 import json
-from ..analyzer import PacketProcessor
-from datetime import timedelta
+from core.packet_processor import PacketProcessor
 
 class PandasAnalyzer(PacketProcessor):
     """
@@ -45,7 +44,6 @@ class PandasAnalyzer(PacketProcessor):
                 self._check_anomalies(packet_info)
                 
         except Exception as e:
-            # Silenciar errores para no interrumpir el análisis
             pass
     
     def _extract_packet_info(self, packet) -> Optional[Dict]:
@@ -218,6 +216,10 @@ class PandasAnalyzer(PacketProcessor):
         return self._serialize_report(report)
     
     def _serialize_report(self, report: Dict) -> Dict:
+        """Convierte objetos no serializables (Timestamp, timedelta) a strings"""
+        import json
+        from datetime import timedelta
+        
         def default_serializer(obj):
             if hasattr(obj, 'isoformat'):  # Para datetime, Timestamp
                 return obj.isoformat()
@@ -321,9 +323,9 @@ class PandasAnalyzer(PacketProcessor):
         
         # Agrupar por intervalos de tiempo
         timeline = (self.df_packets.set_index('timestamp')
-                .resample('1min')['length']
-                .agg(['count', 'sum'])
-                .rename(columns={'count': 'packets_per_minute', 'sum': 'bytes_per_minute'}))
+                   .resample('1min')['length']
+                   .agg(['count', 'sum'])
+                   .rename(columns={'count': 'packets_per_minute', 'sum': 'bytes_per_minute'}))
         
         # Encontrar el pico de tráfico
         peak_time = timeline['bytes_per_minute'].idxmax()
@@ -361,3 +363,14 @@ class PandasAnalyzer(PacketProcessor):
             summary_data = self.generate_security_report()
             summary_df = pd.DataFrame([summary_data['overview']])
             summary_df.to_excel(writer, sheet_name='Summary', index=False)
+    
+    def get_stats(self):
+        """Devuelve estadísticas del analizador pandas"""
+        return {
+            'dataframes_built': all(df is not None for df in [
+                self.df_packets, self.df_connections, self.df_dns, 
+                self.df_http, self.df_anomalies
+            ]),
+            'total_packets_processed': len(self.packet_data),
+            'anomalies_detected': len(self.anomalies)
+        }

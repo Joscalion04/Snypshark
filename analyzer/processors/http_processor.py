@@ -1,4 +1,4 @@
-from ..analyzer import PacketProcessor
+from core.packet_processor import PacketProcessor
 from collections import Counter
 import threading
 
@@ -13,17 +13,10 @@ class HTTPProcessor(PacketProcessor):
     
     def process_packet(self, packet):
         try:
-            # Verificación rápida de capas
-            layers = packet.layers
-            if not layers:
-                return
-                
-            # Búsqueda optimizada
-            for layer in layers:
+            for layer in packet.layers:
                 if layer.layer_name == 'http':
                     self._process_http_layer(packet.http)
                     break
-                    
         except (AttributeError, TypeError):
             pass
     
@@ -47,3 +40,12 @@ class HTTPProcessor(PacketProcessor):
     
     def get_processed_count(self):
         return self._processed_count
+
+    def get_stats(self):
+        with self._methods_lock:
+            with self._hosts_lock:
+                return {
+                    'total_requests': self._processed_count,
+                    'methods': dict(self.methods),
+                    'hosts': dict(self.hosts.most_common(10))
+                }
