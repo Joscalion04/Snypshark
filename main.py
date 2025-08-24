@@ -7,6 +7,7 @@ from analyzer.protocol_handlers.icmp_handler import ICMPProcessor
 from analyzer.protocol_handlers.dns_handler import DNSProcessor
 from analyzer.protocol_handlers.udp_handler import UDPProcessor
 from analyzer.utils.pattern_matcher import PatternMatcher
+from analyzer.data_analysis.pandas_analyzer import PandasAnalyzer  
 from analyzer.ui.menu import InteractiveMenu
 from analyzer.ui.osi_layers import OSILayerAnalyzer
 from analyzer.utils.progress import ProgressBar
@@ -14,7 +15,33 @@ from analyzer.utils.progress import ProgressBar
 import time
 import os
 import sys
+import json
 
+import time
+import os
+import sys
+import json
+
+def _show_pandas_summary(pandas_analyzer):
+    """Muestra un resumen rápido del análisis con pandas"""
+    report = pandas_analyzer.generate_security_report()
+    
+    print("\n" + "="*50)
+    print("📈 PANDAS ANALYSIS SUMMARY")
+    print("="*50)
+    
+    overview = report.get('overview', {})
+    print(f"Total packets: {overview.get('total_packets', 0):,}")
+    print(f"Total bytes: {overview.get('total_bytes', 0):,}")
+    print(f"Unique IPs: {overview.get('unique_ips', 0)}")
+    print(f"Time duration: {overview.get('time_duration', 'N/A')}")
+    
+    anomalies = report.get('anomalies_detected', {})
+    if anomalies.get('total_anomalies', 0) > 0:
+        print(f"🚨 Anomalies detected: {anomalies['total_anomalies']}")
+        print(f"   Types: {json.dumps(anomalies.get('anomaly_types', {}), indent=2)}")
+    
+    print("="*50)
 
 def main():
     """
@@ -51,7 +78,8 @@ def main():
             'http': HTTPProcessor(),
             'dhcp': DHCPProcessor(),
             'udp': UDPProcessor(),
-            'patterns': PatternMatcher()
+            'patterns': PatternMatcher(),
+            'pandas': PandasAnalyzer()  # Nuevo procesador
         }
         for p in processors.values():
             analyzer.add_processor(p)
@@ -67,6 +95,14 @@ def main():
         elapsed = time.time() - start_time
         print(f"\n⏱️ Analysis time: {elapsed:.2f} seconds")
 
+        # Construir DataFrames de pandas
+        print("\n📊 Building pandas DataFrames...")
+        pandas_analyzer = processors['pandas']
+        pandas_analyzer.build_dataframes()
+        
+        # Mostrar resumen rápido
+        _show_pandas_summary(pandas_analyzer)
+
         # Menú
         print("\n===== [Interactive Analysis] =====")
         menu = InteractiveMenu(analyzer, processors)
@@ -76,7 +112,6 @@ def main():
         print("\n🛑 Interrupted by user")
     except Exception as e:
         print(f"❌ Unexpected error: {str(e)}")
-
 
 if __name__ == "__main__":
     main()
