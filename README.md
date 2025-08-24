@@ -115,58 +115,104 @@ Follow the interactive prompts to select your PCAP file and analysis options.
 
 ```
 snypshark/
-├── analyzer/
-│   ├── __init__.py
-│   ├── analyzer.py              # Core analysis engine
-│   ├── data_analysis/      
-│   |   └── pandas_analyzer.py       # Advanced data analysis
-│   ├── protocol_handlers/       # Protocol-specific processors
-│   │   ├── tcp_handler.py
-│   │   ├── udp_handler.py
-│   │   ├── ip_handler.py
-│   │   ├── icmp_handler.py
-│   │   ├── dns_handler.py
-│   │   ├── http_handler.py
-│   │   └── dhcp_handler.py
-│   ├── utils/                   # Utility modules
-│   │   ├── pattern_matcher.py
-│   │   ├── progress.py
-│   │   └── __init__.py
-│   └── ui/                      # User interface
-│       ├── menu.py
-│       ├── osi_layers.py
-│       └── __init__.py
-├── data/                        # Sample PCAP files
-├── tests/                       # Test suite
-├── main.py                      # CLI entry point
-├── requirements.txt             # Production dependencies
-├── requirements-dev.txt         # Development dependencies
-├── setup.py                     # Package configuration
-└── README.md                    # This file
+├── 📂 src/
+│   ├── 📂 analyzer/
+│   │   ├── 📂 core/                    # System Core
+│   │   │   ├── 🐍 __init__.py
+│   │   │   ├── 🐍 analyzer.py          
+│   │   │   ├── 🐍 parallel_engine.py   
+│   │   │   └── 🐍 packet_processor.py  
+│   │   │
+│   │   ├── 📂 processors/              # Protocols Processors
+│   │   │   ├── 🐍 __init__.py
+│   │   │   ├── 🐍 ip_processor.py
+│   │   │   ├── 🐍 tcp_processor.py
+│   │   │   ├── 🐍 udp_processor.py
+│   │   │   ├── 🐍 icmp_processor.py
+│   │   │   ├── 🐍 dns_processor.py
+│   │   │   ├── 🐍 http_processor.py
+│   │   │   ├── 🐍 dhcp_processor.py
+│   │   │   └── 🐍 pattern_processor.py
+│   │   │
+│   │   ├── 📂 analytics/               # Pandas Advanced Analytics 
+│   │   │   ├── 🐍 __init__.py
+│   │   │   ├── 🐍 pandas_analyzer.py
+│   │   │   ├── 🐍 security_analyzer.py
+│   │   │   ├── 🐍 statistical_analyzer.py
+│   │   │   └── 🐍 timeline_analyzer.py
+│   │   │
+│   │   ├── 📂 ui/                      # UI
+│   │   │   ├── 🐍 __init__.py
+│   │   │   ├── 🐍 cli_interface.py
+│   │   │   ├── 🐍 menu_system.py
+│   │   │   ├── 🐍 progress_renderer.py
+│   │   │   └── 🐍 osi_visualizer.py
+│   │   │
+│   │   ├── 📂 utils/                   # Utils 
+│   │   │   ├── 🐍 __init__.py
+│   │   │   ├── 🐍 file_utils.py
+│   │   │   ├── 🐍 performance_utils.py
+│   │   │   ├── 🐍 validation_utils.py
+│   │   │   └── 🐍 export_utils.py
+│   │   │
+│   │   ├── 📂 config/                  # Performance and Configuration
+│   │   │   ├── 🐍 __init__.py
+│   │   │   ├── 🐍 performance_config.py
+│   │   │   ├── 🐍 settings.py
+│   │   │   └── 🐍 constants.py
+│   │   │
+│   │   └── 🐍 __init__.py
+│   │
+│   ├── 📂 tests/                       # Testing
+│   │   ├── 🐍 __init__.py
+│   │   ├── 🐍 test_core.py
+│   │   ├── 🐍 test_processors.py
+│   │   ├── 🐍 test_analytics.py
+│   │   ├── 🐍 test_ui.py
+│   │   └── 🐍 conftest.py
+│   │
+│   └── 🐍 main.py                      # Principal endpoint
+│
+├── 📂 data/                            # Datos y testing resources 
+│   ├── 📂 samples/                     # PCAPs Exampls
+│   ├── 📂 outputs/                     # Analytics Outputs
+│   └── 📂 templates/                   # Templates Reporting (Future LaTex)
+│
+├── 📄 requirements.txt                 # Dependencias principales
+├── 📄 requirements-dev.txt             # Dependencias de desarrollo
+├── 📄 pyproject.toml                   # Configuración moderna
+├── 📄 setup.py                         # Setup tradicional
+├── 📄 .gitignore
+├── 📄 LICENSE
+└── 📄 README.md
 ```
 
 ## 🔧 Dependencies
 
 ### Core Dependencies
 ```txt
-pyshark>=0.5.0          # PCAP file parsing
-pandas>=1.5.0           # Data analysis and manipulation
-numpy>=1.24.0           # Numerical computing
-openpyxl>=3.1.0         # Excel export functionality
-colorama>=0.4.0         # Terminal color support
-python-dateutil>=2.8.0  # Date and time handling
+pyshark>=0.5.0
+pandas>=1.5.0
+numpy>=1.24.0
+openpyxl>=3.1.0
+colorama>=0.4.0
+tqdm>=4.65.0
+python-dateutil>=2.8.0
+psutil>=5.9.0
 ```
 
 ### Development Dependencies
 ```txt
-pytest>=7.0.0           # Testing framework
-pytest-cov>=4.0.0       # Test coverage reporting
-pytest-mock>=3.10.0     # Mocking for tests
-black>=23.0.0           # Code formatting
-flake8>=6.0.0           # Code linting
-isort>=5.12.0           import sorting
-mypy>=1.0.0             # Static type checking
-pre-commit>=3.0.0       # Git pre-commit hooks
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.12.0
+mypy>=1.0.0
+pre-commit>=3.0.0
+ipython>=8.0.0
+jupyter>=1.0.0
 ```
 
 ## 🧪 Testing
