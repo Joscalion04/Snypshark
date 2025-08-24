@@ -7,7 +7,7 @@ from analyzer.protocol_handlers.icmp_handler import ICMPProcessor
 from analyzer.protocol_handlers.dns_handler import DNSProcessor
 from analyzer.protocol_handlers.udp_handler import UDPProcessor
 from analyzer.utils.pattern_matcher import PatternMatcher
-from analyzer.data_analysis.pandas_analyzer import PandasAnalyzer  
+from analyzer.data_analysis.pandas_analyzer import PandasAnalyzer
 from analyzer.ui.menu import InteractiveMenu
 from analyzer.ui.osi_layers import OSILayerAnalyzer
 from analyzer.utils.progress import ProgressBar
@@ -16,102 +16,176 @@ import time
 import os
 import sys
 import json
+from pathlib import Path
 
-import time
-import os
-import sys
-import json
+def print_banner():
+    """Muestra un banner atractivo"""
+    banner = r"""
+    ┌───────────────────────────────────────────────────┐
+    │                                                   │
+    │              🕵️ SNYPSHARK ANALYZER                │
+    │           Network Forensic Tool v1.0              │
+    │                                                   │
+    └───────────────────────────────────────────────────┘
+    """
+    print(banner)
+
+def get_file_path():
+    """Obtiene la ruta del archivo con interfaz amigable"""
+    print("📁 FILE SELECTION")
+    print("═" * 50)
+    
+    while True:
+        file_path = input("📂 Enter path to .pcap/.pcapng file: ").strip()
+        
+        if not file_path:
+            print("❌ Please enter a file path")
+            continue
+            
+        # Expandir ~ y variables de entorno
+        file_path = os.path.expanduser(os.path.expandvars(file_path))
+        
+        if not os.path.isfile(file_path):
+            print("❌ File not found. Please check the path and try again.")
+            print("💡 Tip: You can drag and drop the file into the terminal")
+            continue
+            
+        if not file_path.lower().endswith(('.pcap', '.pcapng')):
+            print("⚠️  Warning: File extension is not .pcap or .pcapng")
+            confirm = input("   Continue anyway? (y/N): ").strip().lower()
+            if confirm != 'y':
+                continue
+        
+        # Mostrar información del archivo
+        file_size = os.path.getsize(file_path)
+        file_name = os.path.basename(file_path)
+        
+        print(f"✅ File found: {file_name}")
+        print(f"📊 Size: {file_size / (1024*1024):.2f} MB")
+        print("═" * 50)
+        
+        return file_path
+
+def analyze_file(file_path):
+    """Realiza el análisis del archivo con interfaz mejorada"""
+    print("\n🔍 STARTING ANALYSIS")
+    print("═" * 50)
+    
+    # Pre-conteo para barra de progreso
+    print("⏳ Counting packets...")
+    total_packets = PCAPAnalyzer.count_packets(file_path)
+    
+    if total_packets == 0:
+        print("❌ No packets found in capture.")
+        return None, None, None
+    
+    print(f"📦 Total packets to analyze: {total_packets:,}")
+    
+    # Overview OSI
+    print("\n🌐 OSI LAYER OVERVIEW")
+    print("─" * 30)
+    OSILayerAnalyzer.analyze(file_path, sample_size=3)
+    
+    # Inicializar analyzer
+    analyzer = PCAPAnalyzer(file_path)
+    
+    # Registrar procesadores
+    processors = {
+        'tcp': TCPProcessor(),
+        'ip': IPProcessor(),
+        'icmp': ICMPProcessor(),
+        'dns': DNSProcessor(),
+        'http': HTTPProcessor(),
+        'dhcp': DHCPProcessor(),
+        'udp': UDPProcessor(),
+        'patterns': PatternMatcher(),
+        'pandas': PandasAnalyzer()
+    }
+    
+    for name, processor in processors.items():
+        analyzer.add_processor(processor)
+        print(f"✅ Loaded {name.upper()} processor")
+    
+    # Barra de progreso con estilo mejorado
+    print(f"\n🚀 Analyzing {total_packets:,} packets...")
+    bar = ProgressBar(total=total_packets, length=40, prefix="Progress")
+    
+    start_time = time.time()
+    analyzer.analyze(progress_callback=bar.update)
+    bar.finish()
+    
+    elapsed = time.time() - start_time
+    print(f"⏱️  Analysis completed in {elapsed:.2f} seconds")
+    print(f"📊 Processing speed: {total_packets/elapsed:.0f} packets/second")
+    
+    # Construir DataFrames de pandas
+    print("\n📈 BUILDING ADVANCED ANALYSIS")
+    print("─" * 30)
+    pandas_analyzer = processors['pandas']
+    pandas_analyzer.build_dataframes()
+    
+    # Mostrar resumen rápido
+    _show_pandas_summary(pandas_analyzer)
+    
+    return analyzer, processors, pandas_analyzer
 
 def _show_pandas_summary(pandas_analyzer):
     """Muestra un resumen rápido del análisis con pandas"""
     report = pandas_analyzer.generate_security_report()
     
-    print("\n" + "="*50)
-    print("📈 PANDAS ANALYSIS SUMMARY")
-    print("="*50)
+    print("\n" + "═" * 60)
+    print("📊 PANDAS ANALYSIS SUMMARY")
+    print("═" * 60)
     
     overview = report.get('overview', {})
-    print(f"Total packets: {overview.get('total_packets', 0):,}")
-    print(f"Total bytes: {overview.get('total_bytes', 0):,}")
-    print(f"Unique IPs: {overview.get('unique_ips', 0)}")
-    print(f"Time duration: {overview.get('time_duration', 'N/A')}")
+    print(f"📦 Total packets: {overview.get('total_packets', 0):,}")
+    print(f"💾 Total bytes: {overview.get('total_bytes', 0):,}")
+    print(f"🌐 Unique IPs: {overview.get('unique_ips', 0)}")
+    print(f"⏰ Time duration: {overview.get('time_duration', 'N/A')}")
     
     anomalies = report.get('anomalies_detected', {})
     if anomalies.get('total_anomalies', 0) > 0:
         print(f"🚨 Anomalies detected: {anomalies['total_anomalies']}")
-        print(f"   Types: {json.dumps(anomalies.get('anomaly_types', {}), indent=2)}")
+        for anomaly, count in anomalies.get('anomaly_types', {}).items():
+            print(f"   ⚠️  {anomaly}: {count}")
     
-    print("="*50)
+    print("═" * 60)
 
 def main():
     """
-    Punto de entrada CLI:
-      1) Solicita ruta de PCAP
-      2) Muestra overview OSI (muestra)
-      3) Analiza con procesadores y barra de progreso
-      4) Lanza menú interactivo
+    Punto de entrada CLI con interfaz mejorada
     """
     try:
-        file_path = input("📂 Enter path to .pcap/.pcapng file: ").strip()
-        if not os.path.isfile(file_path):
-            print("❌ Error: File not found")
-            sys.exit(1)
-
-        print("\n===== [OSI Layer Overview] =====")
-        OSILayerAnalyzer.analyze(file_path, sample_size=5)
-
-        # Pre-conteo para barra de progreso
-        print("\n⏳ Counting packets for progress bar...")
-        total_packets = PCAPAnalyzer.count_packets(file_path)
-        if total_packets == 0:
-            print("⚠️ No packets found in capture.")
-            sys.exit(0)
-
-        analyzer = PCAPAnalyzer(file_path)
-
-        # Dependency Injection: registra procesadores
-        processors = {
-            'tcp': TCPProcessor(),
-            'ip': IPProcessor(),
-            'icmp': ICMPProcessor(),
-            'dns': DNSProcessor(),
-            'http': HTTPProcessor(),
-            'dhcp': DHCPProcessor(),
-            'udp': UDPProcessor(),
-            'patterns': PatternMatcher(),
-            'pandas': PandasAnalyzer()  # Nuevo procesador
-        }
-        for p in processors.values():
-            analyzer.add_processor(p)
-
-        # Barra de progreso
-        print("\n🔍 Analyzing file... (progress below)")
-        bar = ProgressBar(total=total_packets, length=32, prefix="Analyzing")
-
-        start_time = time.time()
-        analyzer.analyze(progress_callback=bar.update)
-        bar.finish()
-
-        elapsed = time.time() - start_time
-        print(f"\n⏱️ Analysis time: {elapsed:.2f} seconds")
-
-        # Construir DataFrames de pandas
-        print("\n📊 Building pandas DataFrames...")
-        pandas_analyzer = processors['pandas']
-        pandas_analyzer.build_dataframes()
+        # Mostrar banner
+        print_banner()
         
-        # Mostrar resumen rápido
-        _show_pandas_summary(pandas_analyzer)
-
-        # Menú
-        print("\n===== [Interactive Analysis] =====")
+        # Obtener archivo
+        file_path = get_file_path()
+        
+        # Analizar archivo
+        analyzer, processors, pandas_analyzer = analyze_file(file_path)
+        
+        if analyzer is None:
+            sys.exit(1)
+        
+        # Menú interactivo
+        print("\n" + "═" * 60)
+        print("🎮 INTERACTIVE ANALYSIS MENU")
+        print("═" * 60)
+        
         menu = InteractiveMenu(analyzer, processors)
         menu.display_menu()
 
     except KeyboardInterrupt:
-        print("\n🛑 Interrupted by user")
+        print("\n\n🛑 Analysis interrupted by user")
+        print("👋 Goodbye!")
     except Exception as e:
-        print(f"❌ Unexpected error: {str(e)}")
+        print(f"\n❌ Unexpected error: {str(e)}")
+        print("💡 Please check if the file is a valid PCAP capture")
+    finally:
+        print("\n" + "═" * 60)
+        print("✨ Thank you for using Snypshark Analyzer!")
+        print("═" * 60)
 
 if __name__ == "__main__":
     main()

@@ -5,6 +5,7 @@ from collections import defaultdict
 from typing import Dict, List, Optional, Any
 import json
 from ..analyzer import PacketProcessor
+from datetime import timedelta
 
 class PandasAnalyzer(PacketProcessor):
     """
@@ -213,18 +214,37 @@ class PandasAnalyzer(PacketProcessor):
             'timeline_analysis': self._get_timeline_analysis()
         }
         
-        return report
+        # Convertir objetos no serializables a strings
+        return self._serialize_report(report)
+    
+    def _serialize_report(self, report: Dict) -> Dict:
+        def default_serializer(obj):
+            if hasattr(obj, 'isoformat'):  # Para datetime, Timestamp
+                return obj.isoformat()
+            elif isinstance(obj, timedelta):
+                return str(obj)
+            elif hasattr(obj, 'to_dict'):  # Para Series de pandas
+                return obj.to_dict()
+            elif hasattr(obj, 'tolist'):  # Para arrays de numpy
+                return obj.tolist()
+            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+        
+        # Convertir el reporte a JSON y de vuelta para serializar todos los objetos
+        report_str = json.dumps(report, default=default_serializer)
+        return json.loads(report_str)
     
     def _get_overview_stats(self) -> Dict:
         """Estadísticas generales del tráfico"""
         if self.df_packets.empty:
             return {}
         
+        time_duration = self.df_packets['timestamp'].max() - self.df_packets['timestamp'].min()
+        
         return {
             'total_packets': len(self.df_packets),
-            'total_bytes': self.df_packets['length'].sum(),
-            'time_duration': self.df_packets['timestamp'].max() - self.df_packets['timestamp'].min(),
-            'avg_packet_size': self.df_packets['length'].mean(),
+            'total_bytes': int(self.df_packets['length'].sum()),
+            'time_duration': str(time_duration),
+            'avg_packet_size': float(self.df_packets['length'].mean()),
             'unique_ips': len(set(self.df_packets['src_ip'].tolist() + self.df_packets['dst_ip'].tolist()))
         }
     
@@ -301,15 +321,18 @@ class PandasAnalyzer(PacketProcessor):
         
         # Agrupar por intervalos de tiempo
         timeline = (self.df_packets.set_index('timestamp')
-                   .resample('1min')['length']
-                   .agg(['count', 'sum'])
-                   .rename(columns={'count': 'packets_per_minute', 'sum': 'bytes_per_minute'}))
+                .resample('1min')['length']
+                .agg(['count', 'sum'])
+                .rename(columns={'count': 'packets_per_minute', 'sum': 'bytes_per_minute'}))
+        
+        # Encontrar el pico de tráfico
+        peak_time = timeline['bytes_per_minute'].idxmax()
         
         return {
-            'peak_traffic_time': timeline['bytes_per_minute'].idxmax().strftime('%Y-%m-%d %H:%M:%S'),
-            'max_packets_per_minute': timeline['packets_per_minute'].max(),
-            'max_bytes_per_minute': timeline['bytes_per_minute'].max(),
-            'timeline_data': timeline.head(10).to_dict()
+            'peak_traffic_time': peak_time.isoformat() if hasattr(peak_time, 'isoformat') else str(peak_time),
+            'max_packets_per_minute': int(timeline['packets_per_minute'].max()),
+            'max_bytes_per_minute': int(timeline['bytes_per_minute'].max()),
+            'timeline_sample': timeline.head(10).to_dict(orient='list')
         }
     
     def export_to_excel(self, filename: str) -> None:
