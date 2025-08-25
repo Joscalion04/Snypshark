@@ -304,6 +304,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 - 📖 [Documentation Wiki](https://deepwiki.com/Joscalion04/Snypshark)
+- 📖 [Mermaid Architecture](https://www.mermaidchart.com/app/projects/a663c48d-527d-4c70-b522-0ad40306e1dc/diagrams/973efd02-85fd-4319-9870-c246cc08adad/version/v0.1/edit)
 - 🐛 [Issue Tracker](https://github.com/joscalion04/snypshark/issues)
 - 💬 [Discussions](https://github.com/joscalion04/snypshark/discussions)
 - 📧 Email: joscalion04@gmail.com
