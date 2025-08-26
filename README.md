@@ -47,6 +47,7 @@
 
 ### Prerequisites
 - Python 3.8 or higher
+- Tshark (Wireshark toolkit)
 - 4GB RAM minimum (8GB recommended for large captures)
 - 500MB disk space
 
