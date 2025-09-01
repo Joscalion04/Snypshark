@@ -1,4 +1,4 @@
-# 🕵️‍♂️ PCAP Network Traffic Analyzer – Snypshark
+#  PCAP Network Traffic Analyzer – Snypshark
 
 <div align="center">
   <img src="assets/logo_2.png" alt="Logo" width="200"/>
@@ -12,23 +12,23 @@
 
 </div>
 
-## 🌟 Features
+##  Features
 
-### 📊 Advanced Data Analysis with Pandas
+###  Advanced Data Analysis with Pandas
 - **Structured Data Processing**: Convert raw packet data into organized DataFrames
 - **Statistical Analysis**: Comprehensive traffic statistics and protocol distribution
 - **Time Series Analysis**: Temporal pattern recognition and traffic timeline
 - **Excel Export**: Generate professional reports in XLSX format
 - **JSON Reports**: Structured data export for integration with other tools
 
-### 🔍 Enhanced Security Detection
+###  Enhanced Security Detection
 - **Port Scan Detection**: Automatic identification of suspicious scanning activity
 - **Anomaly Detection**: Machine-learning ready anomaly scoring system
 - **Pattern Matching**: Custom regex patterns for threat hunting
 - **Top Talkers Analysis**: Identify heaviest traffic generators
 - **Protocol Violation Detection**: Flag non-standard protocol usage
 
-### 🎯 Comprehensive Protocol Support
+###  Comprehensive Protocol Support
 - **Layer 2-7 Analysis**: Full OSI model coverage
 - **TCP/UDP Analysis**: Deep packet inspection with flag analysis
 - **DNS Monitoring**: Query/response correlation and suspicious domain detection
@@ -36,14 +36,14 @@
 - **ICMP Typing**: Comprehensive ICMP type and code analysis
 - **IP Statistics**: TTL analysis, fragmentation monitoring, and hop limit tracking
 
-### 💻 Beautiful User Interface
+###  Beautiful User Interface
 - **Interactive CLI Menu**: Intuitive navigation with categorized options
 - **Real-time Progress Bars**: Visual feedback during analysis
 - **Color-coded Output**: Enhanced readability with emoji indicators
 - **Clear Screen Management**: Professional terminal experience
 - **Export Wizard**: Guided report generation process
 
-## 📦 Installation
+##  Installation
 
 ### Prerequisites
 - Python 3.8 or higher
@@ -79,7 +79,7 @@ pip install -r requirements-dev.txt
 pre-commit install
 ```
 
-## 🚀 Usage
+##  Usage
 
 ### Basic Analysis
 ```bash
@@ -95,7 +95,7 @@ Follow the interactive prompts to select your PCAP file and analysis options.
 5. **Explore results** through interactive menus
 6. **Export findings** to Excel or JSON formats
 
-## 📊 Sample Output
+##  Sample Output
 
 ```bash
 ════════════════════════════════════════════════════════════════
@@ -119,76 +119,76 @@ snypshark/
 ├── 📂 src/
 │   ├── 📂 analyzer/
 │   │   ├── 📂 core/                    # System Core
-│   │   │   ├── 🐍 __init__.py
-│   │   │   ├── 🐍 analyzer.py          
-│   │   │   ├── 🐍 parallel_engine.py   
-│   │   │   └── 🐍 packet_processor.py  
+│   │   │   ├──  __init__.py
+│   │   │   ├──  analyzer.py          
+│   │   │   ├──  parallel_engine.py   
+│   │   │   └──  packet_processor.py  
 │   │   │
 │   │   ├── 📂 processors/              # Protocols Processors
-│   │   │   ├── 🐍 __init__.py
-│   │   │   ├── 🐍 ip_processor.py
-│   │   │   ├── 🐍 tcp_processor.py
-│   │   │   ├── 🐍 udp_processor.py
-│   │   │   ├── 🐍 icmp_processor.py
-│   │   │   ├── 🐍 dns_processor.py
-│   │   │   ├── 🐍 http_processor.py
-│   │   │   ├── 🐍 dhcp_processor.py
-│   │   │   └── 🐍 pattern_processor.py
+│   │   │   ├──  __init__.py
+│   │   │   ├──  ip_processor.py
+│   │   │   ├──  tcp_processor.py
+│   │   │   ├──  udp_processor.py
+│   │   │   ├──  icmp_processor.py
+│   │   │   ├──  dns_processor.py
+│   │   │   ├──  http_processor.py
+│   │   │   ├──  dhcp_processor.py
+│   │   │   └──  pattern_processor.py
 │   │   │
 │   │   ├── 📂 analytics/               # Pandas Advanced Analytics 
-│   │   │   ├── 🐍 __init__.py
-│   │   │   ├── 🐍 pandas_analyzer.py
-│   │   │   ├── 🐍 security_analyzer.py
-│   │   │   ├── 🐍 statistical_analyzer.py
-│   │   │   └── 🐍 timeline_analyzer.py
+│   │   │   ├──  __init__.py
+│   │   │   ├──  pandas_analyzer.py
+│   │   │   ├──  security_analyzer.py
+│   │   │   ├──  statistical_analyzer.py
+│   │   │   └──  timeline_analyzer.py
 │   │   │
 │   │   ├── 📂 ui/                      # UI
-│   │   │   ├── 🐍 __init__.py
-│   │   │   ├── 🐍 cli_interface.py
-│   │   │   ├── 🐍 menu_system.py
-│   │   │   ├── 🐍 progress_renderer.py
-│   │   │   └── 🐍 osi_visualizer.py
+│   │   │   ├──  __init__.py
+│   │   │   ├──  cli_interface.py
+│   │   │   ├──  menu_system.py
+│   │   │   ├──  progress_renderer.py
+│   │   │   └──  osi_visualizer.py
 │   │   │
 │   │   ├── 📂 utils/                   # Utils 
-│   │   │   ├── 🐍 __init__.py
-│   │   │   ├── 🐍 file_utils.py
-│   │   │   ├── 🐍 performance_utils.py
-│   │   │   ├── 🐍 validation_utils.py
-│   │   │   └── 🐍 export_utils.py
+│   │   │   ├──  __init__.py
+│   │   │   ├──  file_utils.py
+│   │   │   ├──  performance_utils.py
+│   │   │   ├──  validation_utils.py
+│   │   │   └──  export_utils.py
 │   │   │
 │   │   ├── 📂 config/                  # Performance and Configuration
-│   │   │   ├── 🐍 __init__.py
-│   │   │   ├── 🐍 performance_config.py
-│   │   │   ├── 🐍 settings.py
-│   │   │   └── 🐍 constants.py
+│   │   │   ├──  __init__.py
+│   │   │   ├──  performance_config.py
+│   │   │   ├──  settings.py
+│   │   │   └──  constants.py
 │   │   │
-│   │   └── 🐍 __init__.py
+│   │   └──  __init__.py
 │   │
 │   ├── 📂 tests/                       # Testing
-│   │   ├── 🐍 __init__.py
-│   │   ├── 🐍 test_core.py
-│   │   ├── 🐍 test_processors.py
-│   │   ├── 🐍 test_analytics.py
-│   │   ├── 🐍 test_ui.py
-│   │   └── 🐍 conftest.py
+│   │   ├──  __init__.py
+│   │   ├──  test_core.py
+│   │   ├──  test_processors.py
+│   │   ├──  test_analytics.py
+│   │   ├──  test_ui.py
+│   │   └──  conftest.py
 │   │
-│   └── 🐍 main.py                      # Principal endpoint
+│   └──  main.py                      # Principal endpoint
 │
 ├── 📂 data/                            # Datos y testing resources 
 │   ├── 📂 samples/                     # PCAPs Exampls
 │   ├── 📂 outputs/                     # Analytics Outputs
 │   └── 📂 templates/                   # Templates Reporting (Future LaTex)
 │
-├── 📄 requirements.txt                 # Dependencias principales
-├── 📄 requirements-dev.txt             # Dependencias de desarrollo
-├── 📄 pyproject.toml                   # Configuración moderna
-├── 📄 setup.py                         # Setup tradicional
-├── 📄 .gitignore
-├── 📄 LICENSE
-└── 📄 README.md
+├──  requirements.txt                 # Dependencias principales
+├──  requirements-dev.txt             # Dependencias de desarrollo
+├──  pyproject.toml                   # Configuración moderna
+├──  setup.py                         # Setup tradicional
+├──  .gitignore
+├──  LICENSE
+└──  README.md
 ```
 
-## 🔧 Dependencies
+##  Dependencies
 
 ### Core Dependencies
 ```txt
@@ -216,7 +216,7 @@ ipython>=8.0.0
 jupyter>=1.0.0
 ```
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Run all tests
@@ -229,7 +229,7 @@ pytest --cov=analyzer
 pytest tests/test_analyzer.py -v
 ```
 
-## 📋 Supported Analysis Types
+##  Supported Analysis Types
 
 ### Protocol Analysis
 - **TCP**: Flag analysis, stream tracking, port statistics
@@ -252,7 +252,7 @@ pytest tests/test_analyzer.py -v
 - **Statistical Summary**: Mean, median, standard deviation
 - **Correlation Analysis**: Protocol and service relationships
 
-## 🎨 UI Features
+##  UI Features
 
 - **Interactive Menus**: Categorized navigation system
 - **Real-time Progress**: Animated progress bars with ETA
@@ -260,7 +260,7 @@ pytest tests/test_analyzer.py -v
 - **Clear Screen Management**: Professional terminal experience
 - **Contextual Help**: In-line guidance and tooltips
 
-## 📁 Export Capabilities
+##  Export Capabilities
 
 ### Excel Export
 - Multiple worksheets with detailed analysis
@@ -274,7 +274,7 @@ pytest tests/test_analyzer.py -v
 - Structured data for further processing
 - Complete analysis results preservation
 
-## 🔮 Roadmap
+##  Roadmap
 
 ### Short-term Goals
 - [ ] Real-time network capture support
@@ -288,7 +288,7 @@ pytest tests/test_analyzer.py -v
 - [ ] Mobile application companion
 - [ ] API for automated analysis
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
@@ -300,23 +300,23 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 Please see our [Commit Guidelines](COMMIT_GUIDELINES.md) for standard commit messages.
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+##  Support
 
-- 📖 [Documentation Wiki](https://deepwiki.com/Joscalion04/Snypshark)
-- 📖 [Mermaid Architecture](https://www.mermaidchart.com/app/projects/a663c48d-527d-4c70-b522-0ad40306e1dc/diagrams/973efd02-85fd-4319-9870-c246cc08adad/version/v0.1/edit)
-- 🐛 [Issue Tracker](https://github.com/joscalion04/snypshark/issues)
-- 💬 [Discussions](https://github.com/joscalion04/snypshark/discussions)
-- 📧 Email: joscalion04@gmail.com
+-  [Documentation Wiki](https://deepwiki.com/Joscalion04/Snypshark)
+-  [Mermaid Architecture](https://www.mermaidchart.com/app/projects/a663c48d-527d-4c70-b522-0ad40306e1dc/diagrams/973efd02-85fd-4319-9870-c246cc08adad/version/v0.1/edit)
+-  [Issue Tracker](https://github.com/joscalion04/snypshark/issues)
+-  [Discussions](https://github.com/joscalion04/snypshark/discussions)
+-  Email: joscalion04@gmail.com
 
-## 👥 Authors
+##  Authors
 
 - **Joseph Leon (Joscalion04)** - Initial work and maintenance
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Inspired by Wireshark and network forensic tools
 - Built with amazing open-source Python libraries
@@ -326,6 +326,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Happy hunting!** 🕵️‍♂️✨
+**Happy hunting!** 
 
 </div>
