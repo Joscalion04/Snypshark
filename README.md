@@ -109,10 +109,10 @@ Follow the interactive prompts to select your PCAP file and analysis options.
 0. 🚪 Exit
 ════════════════════════════════════════════════════════════════
 
-🎯 Select an option (0-5): 4
+ Select an option (0-5): 4
 ```
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ```
 snypshark/
@@ -162,7 +162,7 @@ snypshark/
 │   │   │   ├──  settings.py
 │   │   │   └──  constants.py
 │   │   │
-│   │   └──  __init__.py
+│   │   └── 🐍 __init__.py
 │   │
 │   ├── 📂 tests/                       # Testing
 │   │   ├──  __init__.py
@@ -188,7 +188,7 @@ snypshark/
 └──  README.md
 ```
 
-##  Dependencies
+## 🔧 Dependencies
 
 ### Core Dependencies
 ```txt
@@ -294,13 +294,11 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
+3. Commit your changes (`git commit -m 'messagee'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-Please see our [Commit Guidelines](COMMIT_GUIDELINES.md) for standard commit messages.
-
-##  License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
