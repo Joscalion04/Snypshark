@@ -290,7 +290,7 @@ pytest tests/test_analyzer.py -v
 
 ##  Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guidelines](COMMIT_GUIDELINES.md) for details.
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
