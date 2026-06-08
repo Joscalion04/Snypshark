@@ -105,7 +105,7 @@ snypshark/
 pip install -r requirements.txt          # runtime
 pip install -r requirements-dev.txt      # dev + test
 
-# Run the analyzer
+# Run the analyzer (always from project root)
 python main.py
 
 # Run tests
@@ -115,6 +115,8 @@ pytest tests/test_analyzer.py -v        # single module
 ```
 
 **Runtime requirement:** `tshark` (from Wireshark) must be installed and on `$PATH`.
+
+**Note:** The root `main.py` is the canonical entry point. It adds `analyzer/` to `sys.path` so all imports work. `analyzer/main.py` is a thin shim for running from that subdirectory — do not duplicate application logic there.
 
 ---
 

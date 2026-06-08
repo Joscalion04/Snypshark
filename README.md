@@ -1,118 +1,215 @@
 # Snypshark — PCAP Network Traffic Analyzer
 
 <div align="center">
-  <img src="assets/logo_2.png" alt="Logo" width="200"/>
+  <img src="assets/logo_2.png" alt="Snypshark logo" width="200"/>
 </div>
+
 <div align="center">
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Version](https://img.shields.io/badge/version-0.0.2-orange.svg)
+![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
 
 </div>
 
-##  Features
+Snypshark is a terminal-based PCAP analysis tool for network forensics, security investigation, and traffic inspection. It ingests `.pcap` and `.pcapng` capture files and delivers deep protocol analysis, anomaly detection, and structured reporting — entirely from a CLI.
 
-###  Advanced Data Analysis with Pandas
-- **Structured Data Processing**: Convert raw packet data into organized DataFrames
-- **Statistical Analysis**: Comprehensive traffic statistics and protocol distribution
-- **Time Series Analysis**: Temporal pattern recognition and traffic timeline
-- **Excel Export**: Generate professional reports in XLSX format
-- **JSON Reports**: Structured data export for integration with other tools
+---
 
-###  Enhanced Security Detection
-- **Port Scan Detection**: Automatic identification of suspicious scanning activity
-- **Anomaly Detection**: Machine-learning ready anomaly scoring system
-- **Pattern Matching**: Custom regex patterns for threat hunting
-- **Top Talkers Analysis**: Identify heaviest traffic generators
-- **Protocol Violation Detection**: Flag non-standard protocol usage
+## Features
 
-###  Comprehensive Protocol Support
-- **Layer 2-7 Analysis**: Full OSI model coverage
-- **TCP/UDP Analysis**: Deep packet inspection with flag analysis
-- **DNS Monitoring**: Query/response correlation and suspicious domain detection
-- **HTTP Analysis**: Method tracking, host analysis, and user agent monitoring
-- **ICMP Typing**: Comprehensive ICMP type and code analysis
-- **IP Statistics**: TTL analysis, fragmentation monitoring, and hop limit tracking
+### Protocol Analysis
+- **Full OSI coverage**: Layers 2–7 with per-protocol deep inspection
+- **TCP**: flag analysis, stream tracking, port statistics
+- **UDP**: port distribution, conversation mapping
+- **IP**: TTL analysis, fragmentation, protocol distribution
+- **ICMP**: type/code decoding, error tracking
+- **DNS**: query/response correlation, top domain ranking
+- **HTTP**: method tracking, host analysis, user-agent monitoring
+- **DHCP**: message type distribution, lease monitoring
 
-###  Beautiful User Interface
-- **Interactive CLI Menu**: Intuitive navigation with categorized options
-- **Real-time Progress Bars**: Visual feedback during analysis
-- **Color-coded Output**: Enhanced readability with emoji indicators
-- **Clear Screen Management**: Professional terminal experience
-- **Export Wizard**: Guided report generation process
+### Security Detection
+- Port scan detection (SYN-based heuristics)
+- Anomaly scoring via statistical outlier analysis
+- Custom regex pattern matching across all traffic
+- Top talkers analysis by byte volume
 
-##  Installation
+### Advanced Analytics (Pandas)
+- DataFrame-based aggregation for large captures
+- Time series: traffic volume over time, burst detection
+- Statistical summary: mean, median, stddev, min/max packet size
+- Excel export with multiple worksheets
+- JSON export for integration with external tools
 
-### Prerequisites
+### User Interface
+- Interactive hierarchical CLI menu
+- Real-time progress bar with ETA
+- OSI layer overview for small captures
+- Clean text output — no external dependencies for display
+
+---
+
+## Requirements
+
 - Python 3.8 or higher
-- Tshark (Wireshark toolkit)
-- 4GB RAM minimum (8GB recommended for large captures)
-- 500MB disk space
+- `tshark` installed and available on `$PATH` (Wireshark CLI toolkit)
+- 4 GB RAM minimum (8 GB recommended for captures > 500 MB)
 
-### Quick Install
+---
+
+## Installation
+
 ```bash
-# Clone the repository
 git clone https://github.com/joscalion04/snypshark.git
 cd snypshark
 
-# Create virtual environment (recommended)
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or
-venv\Scripts\activate     # Windows
+source venv/bin/activate       # Linux / macOS
+# venv\Scripts\activate        # Windows
 
-# Install with pip
 pip install -r requirements.txt
-
-# Install in development mode (optional)
-pip install -e .
 ```
 
-### Development Installation
-```bash
-# For contributors and advanced users
-pip install -r requirements-dev.txt
+For development:
 
-# Set up pre-commit hooks
+```bash
+pip install -r requirements-dev.txt
 pre-commit install
 ```
 
-##  Usage
+---
 
-### Basic Analysis
+## Usage
+
 ```bash
 python main.py
 ```
-Follow the interactive prompts to select your PCAP file and analysis options.
 
-### Example Workflow
-1. **Launch the application**
-2. **Drag and drop** your PCAP file when prompted
-3. **View OSI layer overview** for quick insights
-4. **Monitor real-time progress** during analysis
-5. **Explore results** through interactive menus
-6. **Export findings** to Excel or JSON formats
+---
 
-##  Sample Output
+## User Manual
 
-```bash
-════════════════════════════════════════════════════════════════
-🎮 MAIN ANALYSIS MENU
-════════════════════════════════════════════════════════════════
-1. 📦 Packet Statistics
-2. 🌐 Protocol Analysis
-3. 🔍 Security Findings
-4. 📊 Advanced Pandas Analysis
-5. 💾 Export Results
-0. 🚪 Exit
-════════════════════════════════════════════════════════════════
+### 1. Launching the tool
 
- Select an option (0-5): 4
+Run `python main.py` from the project root. The banner prints and the tool enters file selection mode.
+
+### 2. File selection
+
+```
+FILE SELECTION
+==================================================
+Enter path to .pcap/.pcapng file:
 ```
 
-##  Project Structure
+Enter the full path to your capture file. You can drag and drop the file into the terminal on most systems. The tool validates the file before proceeding and reports its size.
+
+Accepted formats: `.pcap`, `.pcapng`. Files without these extensions will prompt for confirmation.
+
+### 3. Analysis startup
+
+The tool counts packets, reports system resources (CPU cores, RAM), and — for captures under 10 000 packets — prints an OSI layer overview showing the first few packets with their protocol chains and a layer frequency table.
+
+Each protocol processor is then registered (TCP, IP, ICMP, DNS, HTTP, DHCP, UDP, Pattern, Pandas) and the parallel analysis loop starts. A live progress bar shows completion percentage and estimated time remaining.
+
+After the analysis loop completes, you are asked:
+
+```
+Enable advanced pandas analysis? (y/N):
+```
+
+Answering `y` builds pandas DataFrames from the collected data and prints a summary (packet count, byte volume, unique IPs, anomalies). This step is optional and adds memory overhead; skip it for quick inspections.
+
+### 4. Interactive menu
+
+After analysis, the main menu is presented:
+
+```
+MAIN ANALYSIS MENU
+============================================================
+  1. Packet Statistics
+  2. Protocol Analysis
+  3. Security Findings
+  4. Advanced Analysis
+  5. Export Results
+  0. Exit
+============================================================
+Select an option (0-5):
+```
+
+Each option opens a submenu. Navigate by entering the number shown. In any submenu, the highest-numbered option returns to the parent menu. Typing `b` at the "Press Enter to continue" prompt also returns.
+
+#### 4.1 Packet Statistics
+
+| Option | Description |
+|--------|-------------|
+| Total packets | Total number of packets processed |
+| Protocol distribution | Top-N protocol names by frequency |
+| Source IPs | Top-N source IP addresses by packet count |
+| TTL analysis | Most common TTL values observed |
+
+For "top-N" views, you are prompted to enter how many items to display (default: shown in brackets).
+
+#### 4.2 Protocol Analysis
+
+| Submenu | Contents |
+|---------|----------|
+| TCP | Flag distribution (SYN, ACK, FIN, RST, etc.), unique stream count |
+| UDP | Top port flows (src->dst), conversation count |
+| DNS | Query list, top queried domains, response count |
+| HTTP | Method distribution (GET, POST, ...), top hosts |
+| ICMP | Type/code distribution |
+
+#### 4.3 Security Findings
+
+| Option | Description |
+|--------|-------------|
+| Pattern matches | Keyword hits from the regex pattern engine |
+| Anomalies detected | Total anomaly count and breakdown by type |
+| Port scan detection | Count of heuristically flagged SYN-only packets |
+
+> **Note:** Pattern matching and anomaly data require the pandas analysis pass to have run. If skipped, these options report unavailability.
+
+#### 4.4 Advanced Analysis (Pandas)
+
+Available only if the pandas analysis pass was enabled at startup.
+
+| Option | Description |
+|--------|-------------|
+| Security Report | Full overview: packets, bytes, IPs, anomaly breakdown |
+| Top Talkers | Top 10 source IPs ranked by byte volume |
+| Protocol Analysis | Protocol distribution with percentage share |
+| Anomalies | Anomaly type breakdown and top offending IPs |
+| DNS Analysis | Query count, unique domains, top queried names |
+| HTTP Analysis | Request count, method distribution, top hosts |
+| Timeline Analysis | Peak traffic timestamp, max packets/min, max bytes/min |
+
+#### 4.5 Export Results
+
+| Option | Output |
+|--------|--------|
+| Export to Excel | Multi-sheet `.xlsx`: Packets, Connections, DNS, HTTP, Anomalies, Summary |
+| Export to JSON | Single `.json` with the full security report structure |
+
+You are prompted for a filename. If none is entered, a default name is used (`network_analysis.xlsx` or `security_report.json`).
+
+### 5. Interrupting analysis
+
+Press `Ctrl+C` at any time to interrupt. The tool exits cleanly with a goodbye message.
+
+---
+
+## Testing
+
+```bash
+pytest                          # run all tests
+pytest --cov=analyzer           # with coverage report
+pytest tests/test_analyzer.py -v
+```
+
+---
+
+## Project Structure
 
 ```
 snypshark/
@@ -122,7 +219,7 @@ snypshark/
 │   ├── core/                   # Packet engine, parallel processing, processor registry
 │   ├── processors/             # Per-protocol analyzers (TCP, UDP, IP, ICMP, DNS, HTTP, DHCP, Pattern)
 │   ├── analytics/              # Pandas-based analytics (security, statistical, timeline)
-│   ├── ui/                     # CLI interface, menus, progress bars, OSI visualizer
+│   ├── ui/                     # CLI interface, menus, progress bar, OSI visualizer
 │   ├── utils/                  # File, performance, validation, and export helpers
 │   └── config/                 # Settings, constants, and performance tuning
 │
@@ -134,10 +231,12 @@ snypshark/
 └── LICENSE
 ```
 
-## 🔧 Dependencies
+---
 
-### Core Dependencies
-```txt
+## Dependencies
+
+### Runtime
+```
 pyshark>=0.5.0
 pandas>=1.5.0
 numpy>=1.24.0
@@ -148,8 +247,8 @@ python-dateutil>=2.8.0
 psutil>=5.9.0
 ```
 
-### Development Dependencies
-```txt
+### Development
+```
 pytest>=7.0.0
 pytest-cov>=4.0.0
 pytest-mock>=3.10.0
@@ -158,118 +257,44 @@ flake8>=6.0.0
 isort>=5.12.0
 mypy>=1.0.0
 pre-commit>=3.0.0
-ipython>=8.0.0
-jupyter>=1.0.0
 ```
-
-##  Testing
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage report
-pytest --cov=analyzer
-
-# Run specific test module
-pytest tests/test_analyzer.py -v
-```
-
-##  Supported Analysis Types
-
-### Protocol Analysis
-- **TCP**: Flag analysis, stream tracking, port statistics
-- **UDP**: Port distribution, packet size analysis
-- **IP**: TTL analysis, fragmentation, protocol distribution
-- **ICMP**: Type/code analysis, error message tracking
-- **DNS**: Query/response correlation, domain analysis
-- **HTTP**: Method analysis, host tracking, status codes
-- **DHCP**: Message type analysis, lease monitoring
-
-### Security Analysis
-- **Port Scan Detection**: SYN flood and stealth scan identification
-- **Anomaly Detection**: Statistical outlier detection
-- **Pattern Matching**: Custom regex pattern matching
-- **Behavior Analysis**: Traffic baseline deviation
-
-### Data Analysis
-- **Time Series**: Traffic patterns over time
-- **Top N Analysis**: Top talkers, protocols, ports
-- **Statistical Summary**: Mean, median, standard deviation
-- **Correlation Analysis**: Protocol and service relationships
-
-##  UI Features
-
-- **Interactive Menus**: Categorized navigation system
-- **Real-time Progress**: Animated progress bars with ETA
-- **Color Coding**: Visual distinction of information types
-- **Clear Screen Management**: Professional terminal experience
-- **Contextual Help**: In-line guidance and tooltips
-
-##  Export Capabilities
-
-### Excel Export
-- Multiple worksheets with detailed analysis
-- Formatted tables and charts-ready data
-- Professional styling and branding
-- Automated report generation
-
-### JSON Export
-- Machine-readable format
-- Integration with other security tools
-- Structured data for further processing
-- Complete analysis results preservation
-
-##  Roadmap
-
-### Short-term Goals
-- [ ] Real-time network capture support
-- [ ] Enhanced visualization capabilities
-- [ ] Custom rule engine for threat detection
-- [ ] Integration with threat intelligence feeds
-
-### Long-term Vision
-- [ ] Machine learning anomaly detection
-- [ ] Cloud-based analysis platform
-- [ ] Mobile application companion
-- [ ] API for automated analysis
-
-##  Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](COMMIT_GUIDELINES.md) for details.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes following [commit guidelines](COMMIT_GUIDELINES.md)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-##  Support
-
--  [Documentation Wiki](https://deepwiki.com/Joscalion04/Snypshark)
--  [Mermaid Architecture](https://www.mermaidchart.com/app/projects/a663c48d-527d-4c70-b522-0ad40306e1dc/diagrams/973efd02-85fd-4319-9870-c246cc08adad/version/v0.1/edit)
--  [Issue Tracker](https://github.com/joscalion04/snypshark/issues)
--  [Discussions](https://github.com/joscalion04/snypshark/discussions)
--  Email: joscalion04@gmail.com
-
-##  Authors
-
-- **Joseph Leon (Joscalion04)** - Initial work and maintenance
-
-##  Acknowledgments
-
-- Inspired by Wireshark and network forensic tools
-- Built with amazing open-source Python libraries
-- Community contributors and testers
 
 ---
 
-<div align="center">
+## Roadmap
 
-**Happy hunting!** 
+- [ ] Real-time capture support (live interface sniffing)
+- [ ] Custom rule engine for threat detection
+- [ ] Integration with threat intelligence feeds
+- [ ] Machine learning anomaly scoring
+- [ ] REST API for automated analysis pipelines
 
-</div>
+---
+
+## Contributing
+
+Contributions are welcome. See [COMMIT_GUIDELINES.md](COMMIT_GUIDELINES.md) for commit conventions.
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit following project conventions
+4. Push and open a Pull Request
+
+---
+
+## Resources
+
+- [Documentation Wiki](https://deepwiki.com/Joscalion04/Snypshark)
+- [Architecture Diagram](https://www.mermaidchart.com/app/projects/a663c48d-527d-4c70-b522-0ad40306e1dc/diagrams/973efd02-85fd-4319-9870-c246cc08adad/version/v0.1/edit)
+- [Issue Tracker](https://github.com/joscalion04/snypshark/issues)
+- [Discussions](https://github.com/joscalion04/snypshark/discussions)
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## Authors
+
+**Joseph Leon (Joscalion04)** — initial development and maintenance

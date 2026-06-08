@@ -1,18 +1,16 @@
-from core.packet_processor import PacketProcessor
-from collections import Counter
+from collections import Counter, defaultdict
 import threading
-from collections import defaultdict
+from core.packet_processor import PacketProcessor
+
 
 class UDPProcessor(PacketProcessor):
-    """Handles UDP-specific packet processing with port optimization"""
     def __init__(self):
-        self.ports = Counter()
+        self.port_flows: Counter = Counter()
+        self._unique_ports: set = set()
+        self._conversations: defaultdict = defaultdict(int)
         self._lock = threading.Lock()
-        self._port_cache = defaultdict(int)
-        self._unique_ports = set()
-        self._conversations = defaultdict(int)
 
-    def process_packet(self, packet):
+    def process_packet(self, packet) -> None:
         try:
             for layer in packet.layers:
                 if layer.layer_name == 'udp':
@@ -21,38 +19,32 @@ class UDPProcessor(PacketProcessor):
         except (AttributeError, TypeError):
             pass
 
-    def _process_udp_layer(self, udp_layer):
-        """Procesa la capa UDP de forma optimizada"""
+    def _process_udp_layer(self, udp_layer) -> None:
         try:
-            src_port = udp_layer.srcport
-            dst_port = udp_layer.dstport
-            
+            src = udp_layer.srcport
+            dst = udp_layer.dstport
+            conv_key = f"{src}-{dst}" if src < dst else f"{dst}-{src}"
+
             with self._lock:
-                self.ports[f"{src_port}->{dst_port}"] += 1
-                self._port_cache[f"{src_port}->{dst_port}"] += 1
-                self._unique_ports.add(src_port)
-                self._unique_ports.add(dst_port)
-                
-                conversation_key = f"{src_port}-{dst_port}" if src_port < dst_port else f"{dst_port}-{src_port}"
-                self._conversations[conversation_key] += 1
-                
+                self.port_flows[f"{src}->{dst}"] += 1
+                self._unique_ports.add(src)
+                self._unique_ports.add(dst)
+                self._conversations[conv_key] += 1
         except (AttributeError, ValueError):
             pass
 
-    def get_unique_port_count(self):
-        """Devuelve número de puertos únicos"""
+    def get_unique_port_count(self) -> int:
         with self._lock:
             return len(self._unique_ports)
 
-    def get_conversation_stats(self):
-        """Devuelve estadísticas de conversaciones"""
+    def get_conversation_stats(self) -> dict:
         with self._lock:
             return dict(self._conversations)
 
-    def get_stats(self):
+    def get_stats(self) -> dict:
         with self._lock:
             return {
                 'unique_ports': len(self._unique_ports),
-                'top_ports': dict(self.ports.most_common(10)),
-                'conversation_count': len(self._conversations)
+                'top_ports': dict(self.port_flows.most_common(10)),
+                'conversation_count': len(self._conversations),
             }

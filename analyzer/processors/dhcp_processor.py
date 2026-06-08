@@ -1,17 +1,14 @@
-from core.packet_processor import PacketProcessor
 from collections import Counter
 import threading
-from collections import defaultdict
+from core.packet_processor import PacketProcessor
+
 
 class DHCPProcessor(PacketProcessor):
-    """Handles DHCP-specific packet processing with message type optimization"""
     def __init__(self):
-        self.message_types = Counter()
+        self.message_counts: Counter = Counter()
         self._lock = threading.Lock()
-        self._type_cache = defaultdict(int)
-        self._unique_types = set()
-    
-    def process_packet(self, packet):
+
+    def process_packet(self, packet) -> None:
         try:
             for layer in packet.layers:
                 if layer.layer_name == 'bootp':
@@ -19,34 +16,23 @@ class DHCPProcessor(PacketProcessor):
                     break
         except (AttributeError, TypeError):
             pass
-    
-    def _process_bootp_layer(self, bootp_layer):
-        """Procesa la capa bootp de forma optimizada"""
+
+    def _process_bootp_layer(self, bootp_layer) -> None:
         try:
             if hasattr(bootp_layer, 'option_dhcp'):
-                msg_type = bootp_layer.option_dhcp
                 with self._lock:
-                    self.message_types[msg_type] += 1
-                    self._type_cache[msg_type] += 1
-                    self._unique_types.add(msg_type)
-                    
+                    self.message_counts[bootp_layer.option_dhcp] += 1
         except (AttributeError, UnicodeDecodeError):
             pass
-    
-    def get_unique_message_types(self):
-        """Devuelve tipos de mensaje únicos"""
-        with self._lock:
-            return sorted(self._unique_types)
-    
-    def get_message_type_distribution(self):
-        """Devuelve distribución de tipos de mensaje"""
-        with self._lock:
-            return dict(self._type_cache)
 
-    def get_stats(self):
+    def get_unique_message_types(self) -> list:
+        with self._lock:
+            return sorted(self.message_counts.keys())
+
+    def get_stats(self) -> dict:
         with self._lock:
             return {
-                'total_messages': sum(self._type_cache.values()),
-                'unique_types': len(self._unique_types),
-                'message_distribution': dict(self._type_cache)
+                'total_messages': sum(self.message_counts.values()),
+                'unique_types': len(self.message_counts),
+                'message_distribution': dict(self.message_counts),
             }
