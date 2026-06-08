@@ -80,10 +80,95 @@ pre-commit install
 
 ---
 
+## Installation
+
+### Quick install (Debian / Ubuntu / Arch / Manjaro)
+
+```bash
+git clone https://github.com/joscalion04/snypshark.git
+cd snypshark
+./install.sh
+```
+
+The installer:
+1. Detects your distro and installs `python3`, `python3-pip`, `python3-venv`, and `tshark` / `wireshark-cli` via `apt` or `pacman`
+2. Creates a virtual environment in `./venv/`
+3. Installs the Python package and all dependencies
+4. Registers the `snypshark` command at `/usr/local/bin/snypshark`
+5. Adds your user to the `wireshark` group (required for non-root capture)
+
+**Note:** Re-login or run `newgrp wireshark` for group membership to take effect.
+
+### User-local install (no sudo for command link)
+
+```bash
+./install.sh --user
+```
+
+Installs the command to `~/.local/bin/snypshark`. Ensure `~/.local/bin` is in your `$PATH`.
+
+### Uninstall
+
+```bash
+./install.sh --uninstall
+```
+
+### Manual install (any platform)
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -e .
+```
+
+Then run with `python main.py` or `snypshark` (if the venv bin is on your PATH).
+
+---
+
 ## Usage
 
 ```bash
-python main.py
+snypshark FILE [options]
+```
+
+### Options
+
+| Flag | Description |
+|------|-------------|
+| `--batch` | Non-interactive: print structured report and exit |
+| `--protocols LIST` | Comma-separated protocols to load (default: all) |
+| `--pandas` | Enable advanced pandas analysis |
+| `--security` | Include security findings section in batch report |
+| `--osi` | Show OSI layer overview regardless of capture size |
+| `--export FORMAT` | Export results: `excel`, `json`, or `both` |
+| `--output NAME` | Base filename for exports (default: `analysis`) |
+| `--top N` | Top-N items in batch reports (default: 10) |
+| `--quiet` | Suppress progress output |
+| `--version` | Show version and exit |
+| `--help` | Show help and exit |
+
+Available protocols: `tcp`, `udp`, `ip`, `icmp`, `dns`, `http`, `dhcp`, `patterns`, `pandas`
+
+### Examples
+
+```bash
+# Interactive analysis (default)
+snypshark capture.pcap
+
+# Print full report and exit — no interaction
+snypshark capture.pcap --batch
+
+# Security-focused batch report with JSON export
+snypshark capture.pcap --batch --security --pandas --export json --output report
+
+# Only load TCP and DNS processors, top 20 items
+snypshark capture.pcap --protocols tcp,dns --batch --top 20
+
+# Export to both Excel and JSON after interactive session
+snypshark capture.pcap --pandas --export both --output my_analysis
+
+# Fully automated pipeline (CI/scripting)
+snypshark capture.pcap --batch --quiet --pandas --export json --output out
 ```
 
 ---
@@ -92,9 +177,14 @@ python main.py
 
 ### 1. Launching the tool
 
-Run `python main.py` from the project root. The banner prints and the tool enters file selection mode.
+```bash
+snypshark capture.pcap          # interactive (default)
+snypshark capture.pcap --batch  # non-interactive, prints report and exits
+```
 
-### 2. File selection
+If installed without the CLI entry point, use `python main.py` from the project root.
+
+### 2. File selection (interactive mode only)
 
 ```
 FILE SELECTION

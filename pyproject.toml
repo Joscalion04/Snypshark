@@ -5,13 +5,16 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "snypshark"
 version = "0.1.0"
-description = "Advanced PCAP analysis tool"
+description = "PCAP network traffic analyzer for forensics and security investigation"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Joseph Leon", email = "joscalion04@gmail.com"}
 ]
+
+[project.scripts]
+snypshark = "analyzer.cli:main"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

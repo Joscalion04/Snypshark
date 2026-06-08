@@ -64,6 +64,8 @@ snypshark/
 │   │   ├── validation_utils.py # Input sanitization and format checks
 │   │   └── export_utils.py     # Excel/JSON serialization helpers
 │   │
+│   ├── cli.py                  # CLI entry point: argparse, --batch mode, --export, --protocols
+│   │
 │   └── config/                 # Constants and tunable settings — no logic, only data
 │       ├── settings.py         # User-facing configuration knobs
 │       ├── constants.py        # Protocol constants, magic numbers, regex patterns
@@ -77,10 +79,11 @@ snypshark/
 │   └── test_pattern_matcher.py # Regex pattern matching tests
 │
 ├── assets/                     # Static assets — logos only, not imported by code
+├── install.sh                  # Universal installer: Debian + Arch (--user / --uninstall flags)
 ├── requirements.txt            # Runtime dependencies
 ├── requirements-dev.txt        # Dev/test dependencies (pytest, black, mypy, etc.)
-├── pyproject.toml              # Build config and tool settings (pytest, black, mypy)
-├── setup.py                    # Legacy setuptools entrypoint
+├── pyproject.toml              # Build config; [project.scripts] registers snypshark command
+├── setup.py                    # Legacy setuptools; mirrors same entry_points
 ├── COMMIT_GUIDELINES.md        # Project commit message conventions
 ├── NETWORK_PROTOCOLS.md        # Protocol reference used during development
 └── LICENSE                     # MIT
@@ -101,22 +104,32 @@ snypshark/
 ## How to Run
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt          # runtime
-pip install -r requirements-dev.txt      # dev + test
+# Install (Debian/Arch) — registers the snypshark command system-wide
+./install.sh
 
-# Run the analyzer (always from project root)
-python main.py
+# Or manual setup
+pip install -r requirements.txt
+pip install -e .          # registers the snypshark entry point in the active env
 
-# Run tests
+# Run
+snypshark capture.pcap
+snypshark capture.pcap --batch --security --export json
+python main.py            # fallback: root entry point without install
+
+# Tests
 pytest
-pytest --cov=analyzer                    # with coverage
-pytest tests/test_analyzer.py -v        # single module
+pytest --cov=analyzer
+pytest tests/test_analyzer.py -v
 ```
 
-**Runtime requirement:** `tshark` (from Wireshark) must be installed and on `$PATH`.
+**Runtime requirement:** `tshark` must be installed and on `$PATH` (install.sh handles this).
 
-**Note:** The root `main.py` is the canonical entry point. It adds `analyzer/` to `sys.path` so all imports work. `analyzer/main.py` is a thin shim for running from that subdirectory — do not duplicate application logic there.
+**Entry points:**
+- `snypshark` command → `analyzer/cli.py:main` (registered via setup.py / pyproject.toml)
+- `python main.py` → root `main.py` → adds `analyzer/` to sys.path → interactive mode only
+- `analyzer/main.py` → thin shim that delegates to root `main.py`
+
+Do not duplicate application logic across entry points. `cli.py` is the canonical implementation.
 
 ---
 
