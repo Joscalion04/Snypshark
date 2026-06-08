@@ -361,6 +361,37 @@ pre-commit>=3.0.0
 
 ---
 
+## AI Usage Policy
+
+This project permits the use of AI-assisted development tools (code generation, refactoring suggestions, documentation drafting). However, their use is subject to the following non-negotiable conditions.
+
+### What is allowed
+
+- Using AI tools to accelerate boilerplate, explore approaches, or draft initial implementations.
+- Using AI to assist with documentation, commit messages, and test scaffolding.
+- Using AI to review or explain existing code during a PR process.
+
+### What is required
+
+Every piece of AI-generated code that enters this repository must pass a **mandatory human technical review** before being committed. This means:
+
+- The contributor must read, understand, and be able to explain every line they submit.
+- The code must be validated against the project's existing architecture, patterns, and style — not just accepted because it compiles or passes tests.
+- Logic correctness, edge cases, security implications, and performance impact are the contributor's responsibility, not the AI's.
+
+### What is not acceptable
+
+- Committing large AI-generated blocks without reviewing them line by line ("vibecoding").
+- Using AI output as a substitute for understanding the problem.
+- Hiding AI authorship: if a significant portion of a contribution was AI-generated, note it in the PR description.
+- Accepting AI-generated security-sensitive code (packet parsing, anomaly detection, export logic) without explicit scrutiny.
+
+### The underlying principle
+
+AI is a development tool, not a developer. The human contributor is the author of record and bears full responsibility for what they submit. When in doubt, write it yourself.
+
+---
+
 ## Contributing
 
 Contributions are welcome. See [COMMIT_GUIDELINES.md](COMMIT_GUIDELINES.md) for commit conventions.
