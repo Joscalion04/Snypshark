@@ -1,5 +1,8 @@
 from typing import Dict, Callable, Any
 import os
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class MenuSystem:
@@ -15,7 +18,7 @@ class MenuSystem:
 
     def display_current_menu(self) -> bool:
         if self.current_menu not in self.menus:
-            print(f"[ERROR] Menu '{self.current_menu}' not found.")
+            logger.error("Menu '%s' not found.", self.current_menu)
             return False
 
         options = self.menus[self.current_menu]
@@ -31,7 +34,7 @@ class MenuSystem:
 
         options = self.menus[self.current_menu]
         if choice not in options:
-            print("[ERROR] Invalid option.")
+            logger.warning("Invalid menu option: '%s'", choice)
             return None
 
         description, action = options[choice]

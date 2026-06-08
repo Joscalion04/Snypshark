@@ -3,6 +3,9 @@ import json
 import os
 
 from analytics.pandas_analyzer import PandasAnalyzer
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class InteractiveMenu:
@@ -62,7 +65,7 @@ class InteractiveMenu:
 
             action = options.get(choice)
             if not action:
-                input("\n[ERROR] Invalid option. Press Enter to continue...")
+                input("\nInvalid option. Press Enter to continue...")
                 continue
 
             try:
@@ -71,7 +74,7 @@ class InteractiveMenu:
                     print(f"\n{result}")
                 input("\nPress Enter to return to main menu...")
             except Exception as e:
-                print(f"\n[ERROR] {e}")
+                logger.error("%s", e)
                 input("Press Enter to continue...")
 
     # ------------------------------------------------------------------
@@ -174,8 +177,7 @@ class InteractiveMenu:
 
             action = options.get(choice)
             if not action:
-                print("[ERROR] Invalid option.")
-                input("Press Enter to continue...")
+                input("Invalid option. Press Enter to continue...")
                 continue
 
             if action[1] is None:

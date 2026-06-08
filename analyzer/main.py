@@ -20,5 +20,6 @@ if os.path.exists(_root):
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
 else:
-    print(f"[ERROR] Root main.py not found at {_root}")
+    import logging
+    logging.getLogger("snypshark").error("Root main.py not found at %s", _root)
     sys.exit(1)

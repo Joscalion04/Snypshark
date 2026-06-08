@@ -6,6 +6,9 @@ from collections import defaultdict
 import psutil
 
 from .packet_processor import PacketProcessor
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class ParallelProcessingEngine:
@@ -68,7 +71,7 @@ class ParallelProcessingEngine:
                         progress_callback(completed)
 
                 except Exception as e:
-                    print(f"[WARNING] Error processing chunk: {e}")
+                    logger.warning("Error processing chunk: %s", e)
 
         self._stats['processing_time'] = time.time() - start_time
         return self._stats

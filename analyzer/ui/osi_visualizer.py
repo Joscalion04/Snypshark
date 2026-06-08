@@ -1,5 +1,8 @@
 from collections import defaultdict
 import pyshark
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class OSIVisualizer:
@@ -28,7 +31,7 @@ class OSIVisualizer:
                 print(f"  {layer}: {count}")
 
         except Exception as e:
-            print(f"[WARNING] Error analyzing OSI layers: {e}")
+            logger.warning("Error analyzing OSI layers: %s", e)
 
     @staticmethod
     def get_layer_distribution(pcap_path: str) -> dict:

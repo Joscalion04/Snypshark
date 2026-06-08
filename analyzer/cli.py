@@ -35,6 +35,9 @@ from ui.osi_visualizer import OSIVisualizer
 from ui.progress_renderer import ProgressBar
 from utils.file_utils import validate_file_path, get_file_size
 from utils.performance_utils import optimize_memory_settings, get_system_info
+from utils.logger import configure_logging, get_logger
+
+logger = get_logger(__name__)
 
 VERSION = "0.1.0"
 
@@ -148,6 +151,20 @@ examples:
         "--version",
         action="version",
         version=f"snypshark {VERSION}",
+    )
+
+    # -- Logging --
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="WARNING",
+        metavar="LEVEL",
+        help="logging verbosity: DEBUG | INFO | WARNING | ERROR (default: WARNING)",
+    )
+    parser.add_argument(
+        "--log-file",
+        metavar="PATH",
+        help="write log output to PATH in addition to stderr",
     )
 
     return parser
@@ -296,7 +313,7 @@ def run_batch_report(analyzer, processors: dict, args: argparse.Namespace) -> No
 def do_export(processors: dict, args: argparse.Namespace) -> None:
     pa = processors.get("pandas")
     if not pa:
-        print("[WARNING] Pandas analyzer not loaded; export skipped.")
+        logger.warning("Pandas analyzer not loaded; export skipped.")
         return
 
     fmt = args.export
@@ -308,7 +325,7 @@ def do_export(processors: dict, args: argparse.Namespace) -> None:
             pa.export_to_excel(filename)
             print(f"Exported: {filename}")
         except Exception as e:
-            print(f"[ERROR] Excel export failed: {e}")
+            logger.error("Excel export failed: %s", e)
 
     if fmt in ("json", "both"):
         filename = f"{base}.json"
@@ -318,7 +335,7 @@ def do_export(processors: dict, args: argparse.Namespace) -> None:
                 json.dump(report, f, indent=2, default=str)
             print(f"Exported: {filename}")
         except Exception as e:
-            print(f"[ERROR] JSON export failed: {e}")
+            logger.error("JSON export failed: %s", e)
 
 
 # ------------------------------------------------------------------
@@ -329,14 +346,18 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
+    # --quiet escalates log level to ERROR so warnings are also suppressed.
+    log_level = "ERROR" if args.quiet else args.log_level
+    configure_logging(level=log_level, log_file=args.log_file)
+
     file_path = os.path.expanduser(os.path.expandvars(args.file))
 
     if not validate_file_path(file_path):
-        print(f"[ERROR] File not found or not readable: {file_path}")
+        logger.error("File not found or not readable: %s", file_path)
         sys.exit(1)
 
     if not file_path.lower().endswith((".pcap", ".pcapng")):
-        print(f"[WARNING] Unexpected file extension: {file_path}")
+        logger.warning("Unexpected file extension: %s", file_path)
 
     # --export implies --pandas
     if args.export:
@@ -346,8 +367,11 @@ def main() -> None:
     requested = [p.strip().lower() for p in args.protocols.split(",") if p.strip()]
     unknown = [p for p in requested if p not in ALL_PROTOCOLS]
     if unknown:
-        print(f"[ERROR] Unknown protocols: {', '.join(unknown)}")
-        print(f"        Available: {', '.join(ALL_PROTOCOLS)}")
+        logger.error(
+            "Unknown protocols: %s. Available: %s",
+            ", ".join(unknown),
+            ", ".join(ALL_PROTOCOLS),
+        )
         sys.exit(1)
 
     if args.pandas and "pandas" not in requested:
@@ -364,7 +388,7 @@ def main() -> None:
     total_packets = PCAPAnalyzer.count_packets(file_path)
 
     if total_packets == 0:
-        print("[ERROR] No packets found in capture.")
+        logger.error("No packets found in capture.")
         sys.exit(1)
 
     if not args.quiet:

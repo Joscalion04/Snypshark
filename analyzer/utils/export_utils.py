@@ -4,6 +4,9 @@ import pandas as pd
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def export_to_json(data: Dict[str, Any], filename: str, indent: int = 2) -> bool:
@@ -12,7 +15,7 @@ def export_to_json(data: Dict[str, Any], filename: str, indent: int = 2) -> bool
             json.dump(data, f, indent=indent, default=str, ensure_ascii=False)
         return True
     except (IOError, TypeError) as e:
-        print(f"[ERROR] JSON export failed: {e}")
+        logger.error("JSON export failed: %s", e)
         return False
 
 
@@ -26,7 +29,7 @@ def export_to_csv(data: List[Dict[str, Any]], filename: str) -> bool:
             writer.writerows(data)
         return True
     except (IOError, csv.Error) as e:
-        print(f"[ERROR] CSV export failed: {e}")
+        logger.error("CSV export failed: %s", e)
         return False
 
 
@@ -38,7 +41,7 @@ def export_to_excel(dataframes: Dict[str, pd.DataFrame], filename: str) -> bool:
                     df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
         return True
     except Exception as e:
-        print(f"[ERROR] Excel export failed: {e}")
+        logger.error("Excel export failed: %s", e)
         return False
 
 
@@ -78,5 +81,5 @@ def export_analysis_results(analyzer, processors: Dict[str, Any], fmt: str = "js
         return False
 
     except Exception as e:
-        print(f"[ERROR] Report export failed: {e}")
+        logger.error("Report export failed: %s", e)
         return False
