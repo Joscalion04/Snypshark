@@ -30,6 +30,9 @@ from processors.dhcp_processor import DHCPProcessor
 from processors.udp_processor import UDPProcessor
 from processors.pattern_processor import PatternProcessor
 from analytics.pandas_analyzer import PandasAnalyzer
+from analytics.security_analyzer import SecurityAnalyzer
+from analytics.statistical_analyzer import StatisticalAnalyzer
+from analytics.timeline_analyzer import TimelineAnalyzer
 from ui.cli_interface import InteractiveMenu
 from ui.osi_visualizer import OSIVisualizer
 from ui.progress_renderer import ProgressBar
@@ -41,7 +44,10 @@ logger = get_logger(__name__)
 
 VERSION = "0.1.0"
 
-ALL_PROTOCOLS = ("tcp", "udp", "ip", "icmp", "dns", "http", "dhcp", "patterns", "pandas")
+ALL_PROTOCOLS = (
+    "tcp", "udp", "ip", "icmp", "dns", "http", "dhcp",
+    "patterns", "pandas", "security", "stats", "timeline",
+)
 
 _PROCESSOR_MAP = {
     "tcp":      TCPProcessor,
@@ -53,6 +59,9 @@ _PROCESSOR_MAP = {
     "udp":      UDPProcessor,
     "patterns": PatternProcessor,
     "pandas":   PandasAnalyzer,
+    "security": SecurityAnalyzer,
+    "stats":    StatisticalAnalyzer,
+    "timeline": TimelineAnalyzer,
 }
 
 
@@ -264,7 +273,58 @@ def run_batch_report(analyzer, processors: dict, args: argparse.Namespace) -> No
             print(f"  Total messages : {stats['total_messages']}")
             print(f"  Unique types   : {stats['unique_types']}")
 
-    # Security
+    # Threat detection (SecurityAnalyzer)
+    sa = processors.get("security")
+    if sa:
+        stats = sa.get_stats()
+        scanners = stats.get("port_scanners", {})
+        if scanners or stats["large_icmp_count"] or stats["malicious_domain_hits"]:
+            _section("THREAT DETECTION")
+            if scanners:
+                print(f"  Port scan sources  : {stats['port_scan_sources']}")
+                for ip, ports in list(scanners.items())[:top]:
+                    print(f"    {ip}: {ports} ports targeted")
+            if stats["large_icmp_count"]:
+                print(f"  Large ICMP packets : {stats['large_icmp_count']}")
+            if stats["malicious_domain_hits"]:
+                print(f"  Malicious domains  : {stats['malicious_domain_hits']}")
+                for hit in stats.get("malicious_dns_events", [])[:top]:
+                    print(f"    {hit['domain']}  (from {hit['src_ip']})")
+
+    # Statistical analysis (StatisticalAnalyzer)
+    statz = processors.get("stats")
+    if statz:
+        s = statz.get_stats()
+        if s.get("total_packets", 0) > 0:
+            _section("STATISTICAL ANALYSIS")
+            print(f"  Packets analyzed   : {s['total_packets']:,}")
+            print(f"  Anomalous packets  : {s.get('anomalous_packets', 0)}")
+            print(f"  Size mean          : {s.get('packet_size_mean', 0):.2f} bytes")
+            print(f"  Size std           : {s.get('packet_size_std', 0):.2f} bytes")
+            print(f"  Size range         : {s.get('packet_size_min', 0)} – {s.get('packet_size_max', 0)} bytes")
+            if "inter_arrival_mean_ms" in s:
+                print(f"  Inter-arrival mean : {s['inter_arrival_mean_ms']:.3f} ms")
+                print(f"  Inter-arrival std  : {s['inter_arrival_std_ms']:.3f} ms")
+
+    # Traffic timeline (TimelineAnalyzer)
+    ta = processors.get("timeline")
+    if ta:
+        s = ta.get_stats()
+        if s.get("timeline_records", 0) > 0:
+            _section("TRAFFIC TIMELINE")
+            print(f"  Records            : {s['timeline_records']:,}")
+            print(f"  Resolution         : {s['resolution']}")
+            if s.get("peak_traffic_time"):
+                print(f"  Peak traffic time  : {s['peak_traffic_time']}")
+                print(f"  Max pkts/window    : {s.get('max_packets_per_window', 0):,}")
+                print(f"  Max bytes/window   : {s.get('max_bytes_per_window', 0):,}")
+            bursts = s.get("burst_windows", 0)
+            if bursts:
+                print(f"  Traffic bursts     : {bursts}")
+                for w in ta.get_burst_windows()[:3]:
+                    print(f"    {w}")
+
+    # Security (patterns + pandas anomalies, only when --security flag given)
     if args.security:
         _section("SECURITY FINDINGS")
 
@@ -285,7 +345,7 @@ def run_batch_report(analyzer, processors: dict, args: argparse.Namespace) -> No
             for atype, count in anomalies.get("anomaly_types", {}).items():
                 print(f"    {atype}: {count}")
         elif not pa:
-            print("  [NOTE] Run with --security --pandas for anomaly detection.")
+            print("  Run with --security --pandas for pandas-based anomaly detection.")
 
     # Pandas summary (always shown if pandas was loaded)
     pa = processors.get("pandas")

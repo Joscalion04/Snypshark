@@ -5,6 +5,7 @@ from collections import defaultdict
 from typing import Dict, List, Optional, Any
 import json
 from core.packet_processor import PacketProcessor
+from config.constants import SecurityThresholds
 
 class PandasAnalyzer(PacketProcessor):
     """
@@ -145,18 +146,15 @@ class PandasAnalyzer(PacketProcessor):
         }
     
     def _check_anomalies(self, packet_info: Dict) -> None:
-        """Detección básica de anomalías para cybersecurity"""
         anomalies = []
-        
-        # Detección de escaneo de puertos
-        if (packet_info.get('flags') == '0x0002' and  # SYN flag
-            packet_info.get('length', 0) < 100):      # Paquete pequeño
+
+        if (packet_info.get('flags') == '0x0002' and
+                packet_info.get('length', 0) < 100):
             anomalies.append('possible_port_scan')
             self.stats['port_scan_attempts'] += 1
-        
-        # Paquetes ICMP sospechosos
-        if (packet_info.get('protocol') == 'ICMP' and 
-            packet_info.get('length', 0) > 1000):     # ICMP grande
+
+        if (packet_info.get('protocol') == 'ICMP' and
+                packet_info.get('length', 0) > SecurityThresholds.ICMP_LARGE_THRESHOLD):
             anomalies.append('large_icmp_packet')
         
         if anomalies:

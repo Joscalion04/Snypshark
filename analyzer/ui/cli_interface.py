@@ -87,7 +87,9 @@ class InteractiveMenu:
             '2': ("Protocol distribution", self._get_common_protocols),
             '3': ("Source IPs",           self._get_source_ips),
             '4': ("TTL analysis",         self._get_ttls),
-            '5': ("Back",                 None),
+            '5': ("Statistical analysis", self._get_statistical_summary),
+            '6': ("Traffic timeline",     self._get_timeline_summary),
+            '7': ("Back",                 None),
         }
         return self._run_submenu(options, "PACKET STATISTICS")
 
@@ -104,10 +106,11 @@ class InteractiveMenu:
 
     def _security_menu(self) -> None:
         options = {
-            '1': ("Pattern matches",      self._get_patterns),
-            '2': ("Anomalies detected",   self._get_anomalies_summary),
-            '3': ("Port scan detection",  self._get_port_scan_info),
-            '4': ("Back",                 None),
+            '1': ("Threat detection",     self._get_threat_summary),
+            '2': ("Pattern matches",      self._get_patterns),
+            '3': ("Anomalies detected",   self._get_anomalies_summary),
+            '4': ("Port scan details",    self._get_port_scan_info),
+            '5': ("Back",                 None),
         }
         return self._run_submenu(options, "SECURITY FINDINGS")
 
@@ -316,12 +319,95 @@ class InteractiveMenu:
         return "Pattern matches:\n" + "\n".join(lines)
 
     def _get_port_scan_info(self) -> str:
-        pa = self.processors.get('pandas')
-        if not pa:
-            return "Port scan analysis not available."
-        report = pa.generate_security_report()
-        count = report.get('anomalies_detected', {}).get('anomaly_types', {}).get('possible_port_scan', 0)
-        return f"Possible port scan attempts: {count}"
+        sa = self.processors.get('security')
+        if not sa:
+            pa = self.processors.get('pandas')
+            if not pa:
+                return "Port scan analysis not available."
+            report = pa.generate_security_report()
+            count = report.get('anomalies_detected', {}).get('anomaly_types', {}).get('possible_port_scan', 0)
+            return f"Possible port scan attempts (pandas): {count}"
+        scanners = sa.get_port_scan_sources()
+        if not scanners:
+            return "No port scan activity detected."
+        n = self._ask_top(10)
+        lines = [
+            f"Port scan sources: {len(scanners)}",
+            "-" * 40,
+        ]
+        for ip, ports in list(sorted(scanners.items(), key=lambda x: -x[1]))[:n]:
+            lines.append(f"  {ip:<18} : {ports} ports targeted")
+        return "\n".join(lines)
+
+    def _get_threat_summary(self) -> str:
+        sa = self.processors.get('security')
+        if not sa:
+            return "Security analyzer not loaded."
+        stats = sa.get_stats()
+        lines = [
+            "THREAT DETECTION SUMMARY",
+            "=" * 40,
+            f"Port scan sources    : {stats['port_scan_sources']}",
+            f"Large ICMP packets   : {stats['large_icmp_count']}",
+            f"Malicious domain hits: {stats['malicious_domain_hits']}",
+        ]
+        if stats.get('malicious_dns_events'):
+            lines.append("\nMalicious DNS queries:")
+            for hit in stats['malicious_dns_events'][:10]:
+                lines.append(f"  {hit['domain']}  from {hit['src_ip']}")
+        return "\n".join(lines)
+
+    def _get_statistical_summary(self) -> str:
+        st = self.processors.get('stats')
+        if not st:
+            return "Statistical analyzer not loaded."
+        s = st.get_stats()
+        lines = [
+            "STATISTICAL ANALYSIS",
+            "=" * 40,
+            f"Total packets      : {s.get('total_packets', 0):,}",
+            f"Anomalous packets  : {s.get('anomalous_packets', 0)}",
+        ]
+        if 'packet_size_mean' in s:
+            lines += [
+                f"Size mean          : {s['packet_size_mean']:.2f} bytes",
+                f"Size std           : {s['packet_size_std']:.2f} bytes",
+                f"Size range         : {s['packet_size_min']} – {s['packet_size_max']} bytes",
+            ]
+        if 'inter_arrival_mean_ms' in s:
+            lines += [
+                f"Inter-arrival mean : {s['inter_arrival_mean_ms']:.3f} ms",
+                f"Inter-arrival std  : {s['inter_arrival_std_ms']:.3f} ms",
+            ]
+        return "\n".join(lines)
+
+    def _get_timeline_summary(self) -> str:
+        ta = self.processors.get('timeline')
+        if not ta:
+            return "Timeline analyzer not loaded."
+        s = ta.get_stats()
+        if s.get('timeline_records', 0) == 0:
+            return "No timeline data collected."
+        lines = [
+            "TRAFFIC TIMELINE",
+            "=" * 40,
+            f"Records recorded   : {s['timeline_records']:,}",
+            f"Resolution         : {s['resolution']}",
+        ]
+        if s.get('peak_traffic_time'):
+            lines += [
+                f"Peak traffic time  : {s['peak_traffic_time']}",
+                f"Max pkts/window    : {s.get('max_packets_per_window', 0):,}",
+                f"Max bytes/window   : {s.get('max_bytes_per_window', 0):,}",
+            ]
+        bursts = ta.get_burst_windows()
+        if bursts:
+            lines.append(f"Traffic bursts     : {len(bursts)}")
+            for w in bursts[:5]:
+                lines.append(f"  {w}")
+        else:
+            lines.append("Traffic bursts     : none detected")
+        return "\n".join(lines)
 
     def _get_anomalies_summary(self) -> str:
         pa = self.processors.get('pandas')

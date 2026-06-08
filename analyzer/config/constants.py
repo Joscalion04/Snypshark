@@ -38,18 +38,23 @@ class ProtocolConstants:
 
 class SecurityThresholds:
     """Umbrales para detección de seguridad"""
-    
-    PORT_SCAN_THRESHOLD = 10  # Número de SYN packets para considerar port scan
-    DDOS_THRESHOLD = 1000     # Paquetes por segundo para considerar DDoS
-    ANOMALY_THRESHOLD = 3.0   # Desviación estándar para detección de anomalías
-    
+
+    # Número de puertos distintos con SYN para clasificar como port scan
+    PORT_SCAN_THRESHOLD = 10
+    # Paquetes por segundo para considerar ráfaga DDoS
+    DDOS_THRESHOLD = 1000
+    # Desviaciones estándar para marcar tamaño de paquete como anómalo
+    ANOMALY_THRESHOLD = 3.0
+    # Bytes mínimos para considerar un ICMP sospechosamente grande
+    ICMP_LARGE_THRESHOLD = 1000
+
     SUSPICIOUS_PATTERNS = [
         r'password', r'login', r'admin', r'root',
         r'select.*from', r'insert.*into', r'update.*set',
-        r'delete.*from', r'drop.*table'
+        r'delete.*from', r'drop.*table',
     ]
-    
+
     MALICIOUS_DOMAINS = [
         'malware.com', 'phishing.com', 'botnet.com',
-        'exploit.com', 'attack.com'
+        'exploit.com', 'attack.com',
     ]
