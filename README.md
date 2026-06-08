@@ -1,4 +1,4 @@
-#  PCAP Network Traffic Analyzer – Snypshark
+# Snypshark — PCAP Network Traffic Analyzer
 
 <div align="center">
   <img src="assets/logo_2.png" alt="Logo" width="200"/>
@@ -116,76 +116,22 @@ Follow the interactive prompts to select your PCAP file and analysis options.
 
 ```
 snypshark/
-├── 📂 src/
-│   ├── 📂 analyzer/
-│   │   ├── 📂 core/                    # System Core
-│   │   │   ├──  __init__.py
-│   │   │   ├──  analyzer.py          
-│   │   │   ├──  parallel_engine.py   
-│   │   │   └──  packet_processor.py  
-│   │   │
-│   │   ├── 📂 processors/              # Protocols Processors
-│   │   │   ├──  __init__.py
-│   │   │   ├──  ip_processor.py
-│   │   │   ├──  tcp_processor.py
-│   │   │   ├──  udp_processor.py
-│   │   │   ├──  icmp_processor.py
-│   │   │   ├──  dns_processor.py
-│   │   │   ├──  http_processor.py
-│   │   │   ├──  dhcp_processor.py
-│   │   │   └──  pattern_processor.py
-│   │   │
-│   │   ├── 📂 analytics/               # Pandas Advanced Analytics 
-│   │   │   ├──  __init__.py
-│   │   │   ├──  pandas_analyzer.py
-│   │   │   ├──  security_analyzer.py
-│   │   │   ├──  statistical_analyzer.py
-│   │   │   └──  timeline_analyzer.py
-│   │   │
-│   │   ├── 📂 ui/                      # UI
-│   │   │   ├──  __init__.py
-│   │   │   ├──  cli_interface.py
-│   │   │   ├──  menu_system.py
-│   │   │   ├──  progress_renderer.py
-│   │   │   └──  osi_visualizer.py
-│   │   │
-│   │   ├── 📂 utils/                   # Utils 
-│   │   │   ├──  __init__.py
-│   │   │   ├──  file_utils.py
-│   │   │   ├──  performance_utils.py
-│   │   │   ├──  validation_utils.py
-│   │   │   └──  export_utils.py
-│   │   │
-│   │   ├── 📂 config/                  # Performance and Configuration
-│   │   │   ├──  __init__.py
-│   │   │   ├──  performance_config.py
-│   │   │   ├──  settings.py
-│   │   │   └──  constants.py
-│   │   │
-│   │   └── 🐍 __init__.py
-│   │
-│   ├── 📂 tests/                       # Testing
-│   │   ├──  __init__.py
-│   │   ├──  test_core.py
-│   │   ├──  test_processors.py
-│   │   ├──  test_analytics.py
-│   │   ├──  test_ui.py
-│   │   └──  conftest.py
-│   │
-│   └──  main.py                      # Principal endpoint
+├── main.py                     # Entry point
 │
-├── 📂 data/                            # Datos y testing resources 
-│   ├── 📂 samples/                     # PCAPs Exampls
-│   ├── 📂 outputs/                     # Analytics Outputs
-│   └── 📂 templates/                   # Templates Reporting (Future LaTex)
+├── analyzer/                   # Main package
+│   ├── core/                   # Packet engine, parallel processing, processor registry
+│   ├── processors/             # Per-protocol analyzers (TCP, UDP, IP, ICMP, DNS, HTTP, DHCP, Pattern)
+│   ├── analytics/              # Pandas-based analytics (security, statistical, timeline)
+│   ├── ui/                     # CLI interface, menus, progress bars, OSI visualizer
+│   ├── utils/                  # File, performance, validation, and export helpers
+│   └── config/                 # Settings, constants, and performance tuning
 │
-├──  requirements.txt                 # Dependencias principales
-├──  requirements-dev.txt             # Dependencias de desarrollo
-├──  pyproject.toml                   # Configuración moderna
-├──  setup.py                         # Setup tradicional
-├──  .gitignore
-├──  LICENSE
-└──  README.md
+├── tests/                      # Pytest suite
+│
+├── requirements.txt
+├── requirements-dev.txt
+├── pyproject.toml
+└── LICENSE
 ```
 
 ## 🔧 Dependencies
@@ -294,7 +240,7 @@ We welcome contributions! Please see our [Contributing Guidelines](COMMIT_GUIDEL
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'messagee'`)
+3. Commit your changes following [commit guidelines](COMMIT_GUIDELINES.md)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
