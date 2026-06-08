@@ -25,7 +25,7 @@ class Settings:
     def load_from_env(self):
         """Carga configuración desde variables de entorno"""
         for key in self.settings.keys():
-            env_var = f"SNYSHARK_{key.upper()}"
+            env_var = f"SNYPSHARK_{key.upper()}"
             if env_var in os.environ:
                 value = os.environ[env_var]
                 # Convertir tipos

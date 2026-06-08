@@ -1,17 +1,7 @@
-# Análisis de PCAP
 pyshark>=0.5.0
-
-# Análisis de datos con Pandas
 pandas>=1.5.0
 numpy>=1.24.0
 openpyxl>=3.1.0
-
-# Testing y desarrollo
-pytest>=7.0.0
-pytest-cov>=4.0.0
-pytest-mock>=3.10.0
-
-# Utilidades adicionales
-tqdm>=4.65.0          # Para barras de progreso alternativas
-python-dateutil>=2.8.0  # Para manejo de fechas
-colorama>=0.4.0       # Para colores en terminal (opcional pero recomendado)
+psutil>=5.9.0
+python-dateutil>=2.8.0
+colorama>=0.4.0

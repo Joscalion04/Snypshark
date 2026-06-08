@@ -12,12 +12,9 @@ license = {text = "MIT"}
 authors = [
     {name = "Joseph Leon", email = "joscalion04@gmail.com"}
 ]
-
-[project.scripts]
-snypshark = "analyzer.cli:main"
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -26,11 +23,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 
-[tool.setuptools]
-packages = ["analyzer"]
-
-[tool.setuptools.package-dir]
-"" = "."
+[project.scripts]
+snypshark = "analyzer.cli:main"
 
 [project.optional-dependencies]
 test = [
@@ -41,7 +35,9 @@ test = [
 dev = [
     "black>=22.0",
     "flake8>=4.0",
+    "isort>=5.12.0",
     "mypy>=0.910",
+    "pre-commit>=3.0",
 ]
 docs = [
     "sphinx>=7.0",
@@ -49,7 +45,24 @@ docs = [
     "sphinx-autodoc-typehints>=1.0",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["analyzer*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["analyzer"]
 python_files = "test_*.py"
 addopts = "--verbose --color=yes"
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.8"
+ignore_missing_imports = true

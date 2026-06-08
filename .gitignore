@@ -88,3 +88,6 @@ _site/
 # VS Code
 .vscode/settings.json
 .vscode/launch.json
+# Generated output files
+*.xlsx
+reports/

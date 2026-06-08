@@ -1,13 +1,13 @@
 """
-Snypshark - Advanced Network Traffic Analyzer
+Snypshark — PCAP network traffic analyzer.
 """
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 __author__ = "Joseph Leon"
-__email__ = "joscaleon04@example.com"
+__email__ = "joscalion04@gmail.com"
 
-from core.analyzer import PCAPAnalyzer
-from analytics.pandas_analyzer import PandasAnalyzer
-from ui.cli_interface import InteractiveMenu
+from .core.analyzer import PCAPAnalyzer
+from .analytics.pandas_analyzer import PandasAnalyzer
+from .ui.cli_interface import InteractiveMenu
 
-__all__ = ['PCAPAnalyzer', 'PandasAnalyzer', 'InteractiveMenu']
+__all__ = ["PCAPAnalyzer", "PandasAnalyzer", "InteractiveMenu"]
