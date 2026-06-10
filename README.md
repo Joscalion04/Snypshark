@@ -1,7 +1,7 @@
 # Snypshark — PCAP Network Traffic Analyzer
 
 <div align="center">
-  <img src="assets/logo_2.png" alt="Snypshark logo" width="200"/>
+  <img src="assets/logo.png" alt="Snypshark logo" width="200"/>
 </div>
 
 <div align="center">
