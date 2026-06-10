@@ -37,18 +37,20 @@ until the foundation is in place.
 
 ### Tasks
 
-- [ ] **T1.1 — `TelemetrySource` ABC**
+- [x] **T1.1 — `TelemetrySource` ABC**
   Define an abstract base class `TelemetrySource` in `core/` with a single required
   method `stream_events() -> Iterator[TelemetryEvent]`. All input sources must
   implement this interface. Replaces the tight coupling between `PCAPAnalyzer` and
   `pyshark` file objects.
+  → `analyzer/core/telemetry_source.py`
 
-- [ ] **T1.2 — `TelemetryEvent` dataclass**
+- [x] **T1.2 — `TelemetryEvent` dataclass**
   Define a normalized event type `TelemetryEvent(type: str, timestamp: datetime,
   source_id: str, payload: dict)`. The `type` field is a string constant
   (e.g. `"network_packet"`, `"process_start"`, `"log_entry"`) that processors
   use to decide whether to handle the event. Replaces raw pyshark packet objects
   as the unit flowing through the pipeline.
+  → `analyzer/core/telemetry_event.py` — co-creado con T1.1 (el ABC lo requiere directamente)
 
 - [ ] **T1.3 — `PCAPFileSource` (migrate existing behavior)**
   Wrap the current `pyshark`-based packet reading in a concrete `TelemetrySource`
