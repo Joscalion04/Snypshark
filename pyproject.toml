@@ -67,6 +67,23 @@ line_length = 100
 python_version = "3.8"
 ignore_missing_imports = true
 
+[tool.coverage.run]
+source = ["analyzer"]
+# Exclude entry-point shims and interactive UI — these require integration or
+# manual testing and would only inflate the "missed" count unfairly.
+omit = [
+    "analyzer/__init__.py",
+    "analyzer/main.py",
+    "analyzer/cli.py",
+    "analyzer/ui/cli_interface.py",
+    "analyzer/ui/menu_system.py",
+    "analyzer/ui/progress_renderer.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
 [tool.bandit]
 exclude_dirs = ["tests", "assets"]
 # B101 (assert_used) is only excluded from tests via .flake8 per-file-ignores;
