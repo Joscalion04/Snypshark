@@ -22,7 +22,7 @@ class InteractiveMenu:
 
     def _clear_screen(self) -> None:
         try:
-            os.system("cls" if os.name == "nt" else "clear")
+            os.system("cls" if os.name == "nt" else "clear")  # nosec B605
         except Exception:
             print("\n" * 50)
 

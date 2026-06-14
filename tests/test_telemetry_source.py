@@ -5,6 +5,8 @@ TelemetrySource is an ABC — tests drive it through a minimal concrete stub
 (StubSource) defined here. No real I/O is performed.
 """
 
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Iterator
 
