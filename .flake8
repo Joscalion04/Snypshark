@@ -1,0 +1,26 @@
+[flake8]
+max-line-length = 100
+
+# E203: whitespace before ':' — black formats slice notation this way
+# W503: line break before binary operator — black prefers this style
+# B950: bugbear soft line-length — we enforce a hard limit via E501 instead
+extend-ignore = E203,W503,B950
+
+per-file-ignores =
+    # assert is the standard assertion mechanism in pytest — not a code smell here
+    tests/*: B101
+    # sys.path must be manipulated before local imports in these entry points
+    main.py: E402
+    analyzer/cli.py: E402
+
+extend-exclude =
+    .git,
+    __pycache__,
+    *.egg-info,
+    dist/,
+    build/,
+    assets/,
+    .venv,
+    venv,
+    .mypy_cache,
+    .pytest_cache,

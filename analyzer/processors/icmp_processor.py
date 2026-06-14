@@ -1,5 +1,6 @@
-from collections import Counter
 import threading
+from collections import Counter
+
 from core.packet_processor import PacketProcessor
 
 
@@ -11,7 +12,7 @@ class ICMPProcessor(PacketProcessor):
     def process_packet(self, packet) -> None:
         try:
             for layer in packet.layers:
-                if layer.layer_name == 'icmp':
+                if layer.layer_name == "icmp":
                     self._process_icmp_layer(packet.icmp)
                     break
         except (AttributeError, TypeError):
@@ -19,7 +20,7 @@ class ICMPProcessor(PacketProcessor):
 
     def _process_icmp_layer(self, icmp_layer) -> None:
         try:
-            if hasattr(icmp_layer, 'type'):
+            if hasattr(icmp_layer, "type"):
                 with self._lock:
                     self.icmp_types[int(icmp_layer.type)] += 1
         except (ValueError, AttributeError):
@@ -32,6 +33,6 @@ class ICMPProcessor(PacketProcessor):
     def get_stats(self) -> dict:
         with self._lock:
             return {
-                'unique_types': sorted(self.icmp_types.keys()),
-                'type_distribution': dict(self.icmp_types),
+                "unique_types": sorted(self.icmp_types.keys()),
+                "type_distribution": dict(self.icmp_types),
             }

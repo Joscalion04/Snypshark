@@ -1,30 +1,33 @@
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Callable, Optional, Dict, Any
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Callable, Dict, List, Optional
+
 import psutil
+from utils.logger import get_logger
 
 from .packet_processor import PacketProcessor
-from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
 class ParallelProcessingEngine:
-    def __init__(self, max_workers: int = None):
+    def __init__(self, max_workers: Optional[int] = None):
         self.max_workers = max_workers or self._get_optimal_workers()
         self._lock = threading.Lock()
-        self._stats = {
-            'packets_processed': 0,
-            'processing_time': 0,
-            'workers_used': self.max_workers,
+        self._stats: Dict[str, Any] = {
+            "packets_processed": 0,
+            "processing_time": 0,
+            "workers_used": self.max_workers,
         }
-        self._worker_stats: Dict[int, Dict[str, float]] = defaultdict(lambda: {'packets': 0, 'time': 0})
+        self._worker_stats: Dict[int, Dict[str, float]] = defaultdict(
+            lambda: {"packets": 0, "time": 0}
+        )
 
     def _get_optimal_workers(self) -> int:
         cpu_count = psutil.cpu_count(logical=False) or 4
-        memory_gb = psutil.virtual_memory().total / (1024 ** 3)
+        memory_gb = psutil.virtual_memory().total / (1024**3)
 
         if memory_gb < 4:
             return min(cpu_count, 4)
@@ -45,7 +48,7 @@ class ParallelProcessingEngine:
             return self._stats
 
         chunk_size = max(1, total_packets // (self.max_workers * 2))
-        chunks = [packets[i:i + chunk_size] for i in range(0, total_packets, chunk_size)]
+        chunks = [packets[i : i + chunk_size] for i in range(0, total_packets, chunk_size)]
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = {
@@ -58,13 +61,13 @@ class ParallelProcessingEngine:
                 try:
                     result = future.result()
                     chunk_index = futures[future]
-                    completed += result['processed']
+                    completed += result["processed"]
 
                     with self._lock:
-                        self._stats['packets_processed'] += result['processed']
+                        self._stats["packets_processed"] += result["processed"]
                         self._worker_stats[chunk_index] = {
-                            'packets': result['processed'],
-                            'time': result['processing_time'],
+                            "packets": result["processed"],
+                            "time": result["processing_time"],
                         }
 
                     if progress_callback:
@@ -73,10 +76,12 @@ class ParallelProcessingEngine:
                 except Exception as e:
                     logger.warning("Error processing chunk: %s", e)
 
-        self._stats['processing_time'] = time.time() - start_time
+        self._stats["processing_time"] = time.time() - start_time
         return self._stats
 
-    def _process_chunk(self, chunk: List, processors: List[PacketProcessor], chunk_index: int) -> Dict[str, Any]:
+    def _process_chunk(
+        self, chunk: List, processors: List[PacketProcessor], chunk_index: int
+    ) -> Dict[str, Any]:
         chunk_start = time.time()
         processed = 0
 
@@ -89,35 +94,35 @@ class ParallelProcessingEngine:
                 continue
 
         return {
-            'processed': processed,
-            'processing_time': time.time() - chunk_start,
-            'chunk_index': chunk_index,
-            'chunk_size': len(chunk),
+            "processed": processed,
+            "processing_time": time.time() - chunk_start,
+            "chunk_index": chunk_index,
+            "chunk_size": len(chunk),
         }
 
     def get_stats(self) -> Dict[str, Any]:
         stats = self._stats.copy()
 
-        if stats['processing_time'] > 0:
-            stats['packets_per_second'] = stats['packets_processed'] / stats['processing_time']
+        if stats["processing_time"] > 0:
+            stats["packets_per_second"] = stats["packets_processed"] / stats["processing_time"]
 
         worker_stats = {}
         for worker_id, data in self._worker_stats.items():
-            if data['time'] > 0:
+            if data["time"] > 0:
                 worker_stats[worker_id] = {
-                    'packets_processed': data['packets'],
-                    'processing_time': data['time'],
-                    'packets_per_second': data['packets'] / data['time'],
+                    "packets_processed": data["packets"],
+                    "processing_time": data["time"],
+                    "packets_per_second": data["packets"] / data["time"],
                 }
 
-        stats['worker_stats'] = worker_stats
+        stats["worker_stats"] = worker_stats
         return stats
 
     def reset_stats(self) -> None:
         self._stats = {
-            'packets_processed': 0,
-            'processing_time': 0,
-            'workers_used': self.max_workers,
+            "packets_processed": 0,
+            "processing_time": 0,
+            "workers_used": self.max_workers,
         }
         self._worker_stats.clear()
 
@@ -135,8 +140,8 @@ class ParallelProcessingEngine:
         complexities = []
         for packet in packets[:100]:
             try:
-                layers = len(getattr(packet, 'layers', []))
-                size = int(getattr(packet, 'length', 0))
+                layers = len(getattr(packet, "layers", []))
+                size = int(getattr(packet, "length", 0))
                 complexities.append(min(1.0, (layers / 10) + (size / 5000)))
             except Exception:
                 complexities.append(0.5)

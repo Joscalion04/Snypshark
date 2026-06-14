@@ -66,3 +66,8 @@ line_length = 100
 [tool.mypy]
 python_version = "3.8"
 ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "assets"]
+# B101 (assert_used) is only excluded from tests via .flake8 per-file-ignores;
+# in production code an assert finding is a real signal and should not be skipped.

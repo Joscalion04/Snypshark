@@ -26,7 +26,7 @@ class MockPacket:
 
 @pytest.fixture
 def sample_packet():
-    ip_layer  = MockLayer("ip",  src="192.168.1.1", dst="10.0.0.1", ttl="64")
+    ip_layer = MockLayer("ip", src="192.168.1.1", dst="10.0.0.1", ttl="64")
     tcp_layer = MockLayer("tcp", flags="0x12", stream="1")
     return MockPacket(layers=[ip_layer, tcp_layer], length=100)
 

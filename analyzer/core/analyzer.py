@@ -1,24 +1,26 @@
 from __future__ import annotations
-from collections import Counter
-from typing import Callable, Dict, List, Optional
-import pyshark
-import threading
+
 import os
+import threading
+from collections import Counter
+from typing import Callable
+
+import pyshark
+from config.performance_config import PerformanceConfig
+from utils.performance_utils import optimize_memory_settings
 
 from .packet_processor import PacketProcessor
-from .parallel_engine import ParallelProcessingEngine, BatchProcessor
-from utils.performance_utils import optimize_memory_settings
-from config.performance_config import PerformanceConfig
+from .parallel_engine import BatchProcessor, ParallelProcessingEngine
 
 
 class PCAPAnalyzer:
     def __init__(self, pcap_path: str):
         self.pcap_path = pcap_path
-        self.packet_processors: List[PacketProcessor] = []
-        self.stats: Dict[str, object] = {
-            'total_packets': 0,
-            'protocol_counter': Counter(),
-            'tcp_streams': set(),
+        self.packet_processors: list[PacketProcessor] = []
+        self.stats: dict[str, object] = {
+            "total_packets": 0,
+            "protocol_counter": Counter(),
+            "tcp_streams": set(),
         }
         self._parallel_engine = ParallelProcessingEngine()
         self._batch_processor = BatchProcessor()
@@ -27,7 +29,7 @@ class PCAPAnalyzer:
     def add_processor(self, processor: PacketProcessor) -> None:
         self.packet_processors.append(processor)
 
-    def analyze(self, progress_callback: Optional[Callable[[int], None]] = None) -> None:
+    def analyze(self, progress_callback: Callable[[int], None] | None = None) -> None:
         optimize_memory_settings()
 
         file_size = os.path.getsize(self.pcap_path) / (1024 * 1024)
@@ -61,7 +63,7 @@ class PCAPAnalyzer:
             if sample_packets:
                 self._batch_processor.optimize_batch_size(sample_packets)
 
-            self.stats['total_packets'] = packet_count
+            self.stats["total_packets"] = packet_count
 
         engine_stats = self._parallel_engine.get_stats()
         print(f"Packets processed : {engine_stats['packets_processed']:,}")
@@ -77,5 +79,5 @@ class PCAPAnalyzer:
                 total += 1
         return total
 
-    def get_processing_stats(self) -> Dict[str, object]:
+    def get_processing_stats(self) -> dict[str, object]:
         return self._parallel_engine.get_stats()

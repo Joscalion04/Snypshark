@@ -3,6 +3,7 @@
 Snypshark CLI entry point.
 Registered as the `snypshark` command via setup.py / pyproject.toml.
 """
+
 import argparse
 import json
 import os
@@ -20,47 +21,57 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
-from core.analyzer import PCAPAnalyzer
-from processors.tcp_processor import TCPProcessor
-from processors.ip_processor import IPProcessor
-from processors.icmp_processor import ICMPProcessor
-from processors.dns_processor import DNSProcessor
-from processors.http_processor import HTTPProcessor
-from processors.dhcp_processor import DHCPProcessor
-from processors.udp_processor import UDPProcessor
-from processors.pattern_processor import PatternProcessor
 from analytics.pandas_analyzer import PandasAnalyzer
 from analytics.security_analyzer import SecurityAnalyzer
 from analytics.statistical_analyzer import StatisticalAnalyzer
 from analytics.timeline_analyzer import TimelineAnalyzer
+from core.analyzer import PCAPAnalyzer
+from processors.dhcp_processor import DHCPProcessor
+from processors.dns_processor import DNSProcessor
+from processors.http_processor import HTTPProcessor
+from processors.icmp_processor import ICMPProcessor
+from processors.ip_processor import IPProcessor
+from processors.pattern_processor import PatternProcessor
+from processors.tcp_processor import TCPProcessor
+from processors.udp_processor import UDPProcessor
 from ui.cli_interface import InteractiveMenu
 from ui.osi_visualizer import OSIVisualizer
 from ui.progress_renderer import ProgressBar
-from utils.file_utils import validate_file_path, get_file_size
-from utils.performance_utils import optimize_memory_settings, get_system_info
+from utils.file_utils import get_file_size, validate_file_path
 from utils.logger import configure_logging, get_logger
+from utils.performance_utils import get_system_info, optimize_memory_settings
 
 logger = get_logger(__name__)
 
 VERSION = "0.1.0"
 
 ALL_PROTOCOLS = (
-    "tcp", "udp", "ip", "icmp", "dns", "http", "dhcp",
-    "patterns", "pandas", "security", "stats", "timeline",
+    "tcp",
+    "udp",
+    "ip",
+    "icmp",
+    "dns",
+    "http",
+    "dhcp",
+    "patterns",
+    "pandas",
+    "security",
+    "stats",
+    "timeline",
 )
 
 _PROCESSOR_MAP = {
-    "tcp":      TCPProcessor,
-    "ip":       IPProcessor,
-    "icmp":     ICMPProcessor,
-    "dns":      DNSProcessor,
-    "http":     HTTPProcessor,
-    "dhcp":     DHCPProcessor,
-    "udp":      UDPProcessor,
+    "tcp": TCPProcessor,
+    "ip": IPProcessor,
+    "icmp": ICMPProcessor,
+    "dns": DNSProcessor,
+    "http": HTTPProcessor,
+    "dhcp": DHCPProcessor,
+    "udp": UDPProcessor,
     "patterns": PatternProcessor,
-    "pandas":   PandasAnalyzer,
+    "pandas": PandasAnalyzer,
     "security": SecurityAnalyzer,
-    "stats":    StatisticalAnalyzer,
+    "stats": StatisticalAnalyzer,
     "timeline": TimelineAnalyzer,
 }
 
@@ -68,6 +79,7 @@ _PROCESSOR_MAP = {
 # ------------------------------------------------------------------
 # Argument parser
 # ------------------------------------------------------------------
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -182,6 +194,7 @@ examples:
 # ------------------------------------------------------------------
 # Batch report
 # ------------------------------------------------------------------
+
 
 def _divider(char: str = "-", width: int = 50) -> str:
     return char * width
@@ -301,7 +314,8 @@ def run_batch_report(analyzer, processors: dict, args: argparse.Namespace) -> No
             print(f"  Anomalous packets  : {s.get('anomalous_packets', 0)}")
             print(f"  Size mean          : {s.get('packet_size_mean', 0):.2f} bytes")
             print(f"  Size std           : {s.get('packet_size_std', 0):.2f} bytes")
-            print(f"  Size range         : {s.get('packet_size_min', 0)} – {s.get('packet_size_max', 0)} bytes")
+            size_range = f"{s.get('packet_size_min', 0)} – {s.get('packet_size_max', 0)} bytes"
+            print(f"  Size range         : {size_range}")
             if "inter_arrival_mean_ms" in s:
                 print(f"  Inter-arrival mean : {s['inter_arrival_mean_ms']:.3f} ms")
                 print(f"  Inter-arrival std  : {s['inter_arrival_std_ms']:.3f} ms")
@@ -332,9 +346,9 @@ def run_batch_report(analyzer, processors: dict, args: argparse.Namespace) -> No
         if pat:
             pat_stats = pat.get_stats()
             print(f"  Pattern matches: {pat_stats['total_matches']}")
-            for pattern, count in sorted(
-                pat_stats["pattern_matches"].items(), key=lambda x: -x[1]
-            )[:top]:
+            for pattern, count in sorted(pat_stats["pattern_matches"].items(), key=lambda x: -x[1])[
+                :top
+            ]:
                 print(f"    {pattern}: {count}")
 
         pa = processors.get("pandas")
@@ -370,6 +384,7 @@ def run_batch_report(analyzer, processors: dict, args: argparse.Namespace) -> No
 # Export
 # ------------------------------------------------------------------
 
+
 def do_export(processors: dict, args: argparse.Namespace) -> None:
     pa = processors.get("pandas")
     if not pa:
@@ -401,6 +416,7 @@ def do_export(processors: dict, args: argparse.Namespace) -> None:
 # ------------------------------------------------------------------
 # Entry point
 # ------------------------------------------------------------------
+
 
 def main() -> None:
     parser = build_parser()

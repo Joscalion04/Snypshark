@@ -2,6 +2,7 @@
 Unit tests for SecurityAnalyzer, StatisticalAnalyzer, TimelineAnalyzer.
 Covers public API only: process_packet input → get_stats / accessor output.
 """
+
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
@@ -9,10 +10,10 @@ from analytics.security_analyzer import SecurityAnalyzer
 from analytics.statistical_analyzer import StatisticalAnalyzer
 from analytics.timeline_analyzer import TimelineAnalyzer
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _tcp_packet(flags: str, src_ip: str = "10.0.0.1", dst_port: str = "80") -> MagicMock:
     pkt = MagicMock()
@@ -59,6 +60,7 @@ def _sized_packet(size: int, ts=None) -> MagicMock:
 # SecurityAnalyzer
 # ---------------------------------------------------------------------------
 
+
 class TestSecurityAnalyzer:
     def test_no_threats_on_empty(self):
         sa = SecurityAnalyzer()
@@ -70,14 +72,14 @@ class TestSecurityAnalyzer:
     def test_port_scan_below_threshold_not_flagged(self):
         sa = SecurityAnalyzer()
         src = "192.168.1.1"
-        for port in range(5):          # 5 < PORT_SCAN_THRESHOLD (10)
+        for port in range(5):  # 5 < PORT_SCAN_THRESHOLD (10)
             sa.process_packet(_tcp_packet("0x0002", src, str(port)))
         assert sa.get_port_scan_sources() == {}
 
     def test_port_scan_at_threshold_flagged(self):
         sa = SecurityAnalyzer()
         src = "192.168.1.1"
-        for port in range(10):         # exactly PORT_SCAN_THRESHOLD
+        for port in range(10):  # exactly PORT_SCAN_THRESHOLD
             sa.process_packet(_tcp_packet("0x0002", src, str(port)))
         scanners = sa.get_port_scan_sources()
         assert src in scanners
@@ -125,6 +127,7 @@ class TestSecurityAnalyzer:
 # StatisticalAnalyzer
 # ---------------------------------------------------------------------------
 
+
 class TestStatisticalAnalyzer:
     def test_empty_stats(self):
         st = StatisticalAnalyzer()
@@ -170,6 +173,7 @@ class TestStatisticalAnalyzer:
 # ---------------------------------------------------------------------------
 # TimelineAnalyzer
 # ---------------------------------------------------------------------------
+
 
 class TestTimelineAnalyzer:
     def test_empty_timeline(self):

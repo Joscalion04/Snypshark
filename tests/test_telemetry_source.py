@@ -4,19 +4,18 @@ Unit tests for TelemetryEvent, TelemetryEventType, and TelemetrySource.
 TelemetrySource is an ABC — tests drive it through a minimal concrete stub
 (StubSource) defined here. No real I/O is performed.
 """
+
 from datetime import datetime
 from typing import Iterator
-from unittest.mock import MagicMock, call, patch
 
 import pytest
-
 from core.telemetry_event import TelemetryEvent, TelemetryEventType
 from core.telemetry_source import TelemetrySource
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _event(
     etype: str = TelemetryEventType.NETWORK_PACKET,
@@ -61,19 +60,26 @@ class OverrideIdSource(TelemetrySource):
 # TelemetryEventType
 # ---------------------------------------------------------------------------
 
+
 class TestTelemetryEventType:
     def test_all_constants_are_strings(self):
-        for attr in ("NETWORK_PACKET", "PROCESS_START", "PROCESS_END",
-                     "LOG_ENTRY", "CONNECTION", "HOST_CONTEXT"):
+        for attr in (
+            "NETWORK_PACKET",
+            "PROCESS_START",
+            "PROCESS_END",
+            "LOG_ENTRY",
+            "CONNECTION",
+            "HOST_CONTEXT",
+        ):
             assert isinstance(getattr(TelemetryEventType, attr), str)
 
     def test_expected_constant_values(self):
         assert TelemetryEventType.NETWORK_PACKET == "network_packet"
-        assert TelemetryEventType.PROCESS_START  == "process_start"
-        assert TelemetryEventType.PROCESS_END    == "process_end"
-        assert TelemetryEventType.LOG_ENTRY      == "log_entry"
-        assert TelemetryEventType.CONNECTION     == "connection"
-        assert TelemetryEventType.HOST_CONTEXT   == "host_context"
+        assert TelemetryEventType.PROCESS_START == "process_start"
+        assert TelemetryEventType.PROCESS_END == "process_end"
+        assert TelemetryEventType.LOG_ENTRY == "log_entry"
+        assert TelemetryEventType.CONNECTION == "connection"
+        assert TelemetryEventType.HOST_CONTEXT == "host_context"
 
     def test_constants_are_distinct(self):
         constants = [
@@ -90,6 +96,7 @@ class TestTelemetryEventType:
 # ---------------------------------------------------------------------------
 # TelemetryEvent
 # ---------------------------------------------------------------------------
+
 
 class TestTelemetryEvent:
     def test_construction_with_required_fields(self):
@@ -130,7 +137,7 @@ class TestTelemetryEvent:
     def test_inequality_on_different_type(self):
         ts = datetime(2024, 6, 1, 12, 0, 0)
         e1 = TelemetryEvent("network_packet", ts, "src", {})
-        e2 = TelemetryEvent("log_entry",      ts, "src", {})
+        e2 = TelemetryEvent("log_entry", ts, "src", {})
         assert e1 != e2
 
     def test_inequality_on_different_timestamp(self):
@@ -164,6 +171,7 @@ class TestTelemetryEvent:
 # ---------------------------------------------------------------------------
 # TelemetrySource (via StubSource)
 # ---------------------------------------------------------------------------
+
 
 class TestTelemetrySourceAbstract:
     def test_cannot_instantiate_abc_directly(self):
@@ -252,6 +260,6 @@ class TestTelemetrySourceBehavior:
         # Each call to stream_events must produce a fresh iteration.
         events = [_event()]
         src = StubSource(events)
-        first  = list(src.stream_events())
+        first = list(src.stream_events())
         second = list(src.stream_events())
         assert first == second

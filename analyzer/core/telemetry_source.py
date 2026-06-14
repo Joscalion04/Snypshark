@@ -45,7 +45,7 @@ class TelemetrySource(ABC):
         """Yield TelemetryEvent objects until the source is exhausted or closed."""
         ...
 
-    def close(self) -> None:
+    def close(self) -> None:  # noqa: B027 — intentional optional hook, not abstract
         """Release resources held by this source.
 
         Called automatically by __exit__.  Safe to call more than once.
