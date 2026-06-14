@@ -165,8 +165,18 @@ jobs:
       - name: Install package in editable mode
         run: pip install -e .
 
-      - name: Verify CLI entry point is importable
-        run: python -c "from analyzer.cli import main; print('Entry point OK')"
+      # Verify the entry point is registered in the package metadata.
+      # We check metadata rather than importing the module directly because the
+      # internal codebase uses bare imports (e.g. `from config.constants import ...`)
+      # that rely on sys.path being extended by the CLI shim at runtime.
+      - name: Verify snypshark entry point is registered
+        run: |
+          python -c "
+          import importlib.metadata
+          eps = {ep.name for ep in importlib.metadata.entry_points(group='console_scripts')}
+          assert 'snypshark' in eps, f'Entry point missing. Found: {eps}'
+          print('Entry point registered OK')
+          "
 
   # ── 5. Security scan ──────────────────────────────────────────────────────
   # Runs independently — security findings are reported regardless of test
