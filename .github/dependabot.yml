@@ -1,0 +1,35 @@
+version: 2
+updates:
+
+  # ── Python dependencies ────────────────────────────────────────────────────
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/New_York
+    target-branch: dev          # PRs always target dev, never main directly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    # Dev/notebook tooling: only patch/minor bumps automatically.
+    # Major version changes on heavy tools require a manual decision.
+    ignore:
+      - dependency-name: "jupyter*"
+        update-types: [version-update:semver-major]
+      - dependency-name: "notebook"
+        update-types: [version-update:semver-major]
+      - dependency-name: "ipython"
+        update-types: [version-update:semver-major]
+
+  # ── GitHub Actions ─────────────────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+    target-branch: dev
+    labels:
+      - dependencies

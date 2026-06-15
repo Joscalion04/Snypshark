@@ -1,5 +1,6 @@
-from collections import Counter
 import threading
+from collections import Counter
+
 from core.packet_processor import PacketProcessor
 
 _FLAG_NAMES = {
@@ -24,7 +25,7 @@ class TCPProcessor(PacketProcessor):
     def process_packet(self, packet) -> None:
         try:
             for layer in packet.layers:
-                if layer.layer_name == 'tcp':
+                if layer.layer_name == "tcp":
                     self._process_tcp_layer(packet.tcp)
                     break
         except (AttributeError, TypeError):
@@ -33,9 +34,9 @@ class TCPProcessor(PacketProcessor):
     def _process_tcp_layer(self, tcp_layer) -> None:
         try:
             with self._lock:
-                if hasattr(tcp_layer, 'flags'):
+                if hasattr(tcp_layer, "flags"):
                     self.flag_counts[int(tcp_layer.flags, 16)] += 1
-                if hasattr(tcp_layer, 'stream'):
+                if hasattr(tcp_layer, "stream"):
                     self.streams.add(tcp_layer.stream)
         except (ValueError, AttributeError):
             pass
@@ -51,7 +52,7 @@ class TCPProcessor(PacketProcessor):
     def get_stats(self) -> dict:
         with self._lock:
             return {
-                'flag_counts': dict(self.flag_counts),
-                'stream_count': len(self.streams),
-                'unique_streams': list(self.streams)[:10],
+                "flag_counts": dict(self.flag_counts),
+                "stream_count": len(self.streams),
+                "unique_streams": list(self.streams)[:10],
             }

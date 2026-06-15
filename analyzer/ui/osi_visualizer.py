@@ -1,4 +1,5 @@
 from collections import defaultdict
+
 import pyshark
 from utils.logger import get_logger
 
@@ -17,7 +18,7 @@ class OSIVisualizer:
                 for i, packet in enumerate(capture):
                     if i >= sample_size:
                         break
-                    layers = packet.protocol.split(':')
+                    layers = packet.protocol.split(":")
                     chain = " -> ".join(layer.strip() for layer in layers)
                     print(f"  Packet #{i + 1}: {chain}")
                     print(f"  Summary: {packet.info}")
@@ -39,7 +40,7 @@ class OSIVisualizer:
         try:
             with pyshark.FileCapture(pcap_path, only_summaries=True, keep_packets=False) as capture:
                 for packet in capture:
-                    for layer in packet.protocol.split(':'):
+                    for layer in packet.protocol.split(":"):
                         stats[layer.strip()] += 1
         except Exception:
             pass

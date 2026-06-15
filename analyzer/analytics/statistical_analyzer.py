@@ -1,9 +1,8 @@
 from typing import Dict, List
 
 import numpy as np
-
-from core.packet_processor import PacketProcessor
 from config.constants import SecurityThresholds
+from core.packet_processor import PacketProcessor
 
 
 class StatisticalAnalyzer(PacketProcessor):
@@ -20,10 +19,10 @@ class StatisticalAnalyzer(PacketProcessor):
 
     def process_packet(self, packet) -> None:
         try:
-            size = int(getattr(packet, 'length', 0))
+            size = int(getattr(packet, "length", 0))
             self.packet_sizes.append(size)
 
-            current_time = getattr(packet, 'sniff_time', None)
+            current_time = getattr(packet, "sniff_time", None)
             if self._last_packet_time is not None and current_time is not None:
                 delta = (current_time - self._last_packet_time).total_seconds()
                 if delta >= 0:
@@ -53,24 +52,28 @@ class StatisticalAnalyzer(PacketProcessor):
         times = np.array(self.inter_arrival_times, dtype=float)
 
         stats: Dict = {
-            'total_packets': len(self.packet_sizes),
-            'anomalous_packets': self.get_anomalous_count(),
+            "total_packets": len(self.packet_sizes),
+            "anomalous_packets": self.get_anomalous_count(),
         }
 
         if len(sizes) > 0:
-            stats.update({
-                'packet_size_mean': float(sizes.mean()),
-                'packet_size_std':  float(sizes.std()),
-                'packet_size_min':  int(sizes.min()),
-                'packet_size_max':  int(sizes.max()),
-            })
+            stats.update(
+                {
+                    "packet_size_mean": float(sizes.mean()),
+                    "packet_size_std": float(sizes.std()),
+                    "packet_size_min": int(sizes.min()),
+                    "packet_size_max": int(sizes.max()),
+                }
+            )
 
         if len(times) > 0:
-            stats.update({
-                'inter_arrival_mean_ms': float(times.mean() * 1000),
-                'inter_arrival_std_ms':  float(times.std() * 1000),
-                'inter_arrival_min_ms':  float(times.min() * 1000),
-                'inter_arrival_max_ms':  float(times.max() * 1000),
-            })
+            stats.update(
+                {
+                    "inter_arrival_mean_ms": float(times.mean() * 1000),
+                    "inter_arrival_std_ms": float(times.std() * 1000),
+                    "inter_arrival_min_ms": float(times.min() * 1000),
+                    "inter_arrival_max_ms": float(times.max() * 1000),
+                }
+            )
 
         return stats

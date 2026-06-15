@@ -19,21 +19,21 @@ To maintain a consistent and professional Git history in the Snypshark project, 
 
 ## Examples for Snypshark
 
-- `add pcap-parser` → Added a new PCAP parsing module.  
-- `setup analyzer-ui` → Initialized the interactive CLI menu.  
-- `delete legacy-utils` → Removed deprecated helper functions.  
-- `fix anomaly-detection` → Fixed the anomaly scoring bug.  
-- `update export-json` → Updated JSON export formatting.  
+- `add pcap-parser` → Added a new PCAP parsing module.
+- `setup analyzer-ui` → Initialized the interactive CLI menu.
+- `delete legacy-utils` → Removed deprecated helper functions.
+- `fix anomaly-detection` → Fixed the anomaly scoring bug.
+- `update export-json` → Updated JSON export formatting.
 - `tofix top-talkers` → Temporary solution applied; needs optimization later.
 
 ---
 
 ## Best Practices
 
-1. Keep commit messages short and descriptive (50–72 characters recommended).  
-2. Use imperative mood (`Add`, `Fix`, `Update`) instead of past tense.  
-3. Reference issues or tickets if applicable (e.g., `fix #23`).  
-4. Resolve all merge conflicts before committing.  
+1. Keep commit messages short and descriptive (50–72 characters recommended).
+2. Use imperative mood (`Add`, `Fix`, `Update`) instead of past tense.
+3. Reference issues or tickets if applicable (e.g., `fix #23`).
+4. Resolve all merge conflicts before committing.
 5. Avoid committing large binary files directly; use exports if needed.
 
 ---

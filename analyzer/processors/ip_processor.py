@@ -1,9 +1,12 @@
-from collections import Counter
 import threading
+from collections import Counter
+
 from core.packet_processor import PacketProcessor
+
 
 class IPProcessor(PacketProcessor):
     """Handles IP-specific packet processing with optimization"""
+
     def __init__(self):
         self.ip_source_counter = Counter()
         self.ttl_histogram = Counter()
@@ -14,7 +17,7 @@ class IPProcessor(PacketProcessor):
     def process_packet(self, packet):
         try:
             for layer in packet.layers:
-                if layer.layer_name == 'ip':
+                if layer.layer_name == "ip":
                     self._process_ip_layer(packet.ip)
                     break
         except (AttributeError, TypeError):
@@ -25,14 +28,14 @@ class IPProcessor(PacketProcessor):
         try:
             src_ip = ip_layer.src
             ttl_value = int(ip_layer.ttl)
-            
+
             with self._source_lock:
                 self.ip_source_counter[src_ip] += 1
                 self._unique_ips.add(src_ip)
-            
+
             with self._ttl_lock:
                 self.ttl_histogram[ttl_value] += 1
-                
+
         except (ValueError, AttributeError):
             pass
 
@@ -45,7 +48,7 @@ class IPProcessor(PacketProcessor):
         with self._source_lock:
             with self._ttl_lock:
                 return {
-                    'unique_ips': len(self._unique_ips),
-                    'top_sources': dict(self.ip_source_counter.most_common(10)),
-                    'ttl_distribution': dict(self.ttl_histogram.most_common(10))
+                    "unique_ips": len(self._unique_ips),
+                    "top_sources": dict(self.ip_source_counter.most_common(10)),
+                    "ttl_distribution": dict(self.ttl_histogram.most_common(10)),
                 }

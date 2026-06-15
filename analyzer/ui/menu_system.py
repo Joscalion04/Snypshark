@@ -1,5 +1,6 @@
-from typing import Dict, Callable, Any
 import os
+from typing import Any, Dict
+
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -55,6 +56,6 @@ class MenuSystem:
 
     def clear_screen(self) -> None:
         try:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            os.system("cls" if os.name == "nt" else "clear")  # nosec B605
         except Exception:
             print("\n" * 50)

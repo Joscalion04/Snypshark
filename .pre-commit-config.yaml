@@ -1,0 +1,117 @@
+# https://pre-commit.com
+#
+# Install hooks:
+#   pre-commit install
+#   pre-commit install --hook-type pre-push
+#
+# Run against all files:
+#   pre-commit run --all-files
+#
+# Update hook versions:
+#   pre-commit autoupdate
+
+# Configuration for the pre-commit.ci cloud service (optional, no-op locally)
+ci:
+  autofix_commit_message: "style: auto-fixes from pre-commit hooks"
+  autofix_prs: false
+  autoupdate_branch: dev
+  autoupdate_commit_message: "chore: bump pre-commit hook versions"
+  autoupdate_schedule: monthly
+  skip: [mypy, bandit]
+
+default_language_version:
+  python: python3
+
+# All hooks run on commit unless overridden with stages: [pre-push]
+default_stages: [pre-commit]
+
+# Run all hooks even if one fails — surfaces all issues at once
+fail_fast: false
+
+repos:
+  # ── Meta: validate this config file itself ────────────────────────────────
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply       # every hook ID must resolve to a real hook
+      - id: check-useless-excludes  # every exclude pattern must match something
+
+  # ── File hygiene (fast; runs on every commit) ─────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-ast               # Python syntax errors caught before any linter
+      - id: debug-statements        # no leftover pdb / breakpoint() calls
+      - id: detect-private-key      # never commit private keys or certs
+      - id: check-added-large-files
+        args: [--maxkb=500]         # .pcap files must never be committed
+      - id: no-commit-to-branch
+        args: [--branch, main]      # direct pushes to main are blocked locally
+
+  # ── Python syntax modernisation ───────────────────────────────────────────
+  # Upgrades constructs that have idiomatic equivalents in the target version
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.17.0
+    hooks:
+      - id: pyupgrade
+        args: [--py38-plus]         # mirrors requires-python = ">=3.8"
+
+  # ── Import ordering ───────────────────────────────────────────────────────
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        # profile = black and line_length = 100 are read from pyproject.toml
+
+  # ── Code formatting ───────────────────────────────────────────────────────
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        # line-length = 100 and target-version are read from pyproject.toml
+
+  # ── Linting ───────────────────────────────────────────────────────────────
+  # flake8-bugbear: catches real bugs beyond PEP-8 (mutable defaults, etc.)
+  # flake8-comprehensions: flags unnecessary list/set/dict constructions
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear>=24.0
+          - flake8-comprehensions>=3.14
+        # Settings are read from .flake8
+
+  # ── Security scanning (pre-push — medium+ severity only) ─────────────────
+  # Skipped on commit to keep the commit loop fast.
+  # Configuration is in pyproject.toml [tool.bandit].
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        args:
+          - --configfile
+          - pyproject.toml
+          - --severity-level
+          - medium             # suppresses low-severity noise (e.g. os.system for tty clear)
+        stages: [pre-push]
+
+  # ── Static type checking (pre-push — slow by design) ─────────────────────
+  # Skipped on commit. Mirrors-mypy runs mypy in an isolated env; additional
+  # packages must be listed here since the hook cannot import from the project venv.
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports]
+        additional_dependencies:
+          - types-python-dateutil
+        stages: [pre-push]

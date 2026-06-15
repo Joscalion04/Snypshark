@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 
 class TelemetryEventType:
@@ -13,11 +13,11 @@ class TelemetryEventType:
     """
 
     NETWORK_PACKET = "network_packet"
-    PROCESS_START  = "process_start"
-    PROCESS_END    = "process_end"
-    LOG_ENTRY      = "log_entry"
-    CONNECTION     = "connection"
-    HOST_CONTEXT   = "host_context"
+    PROCESS_START = "process_start"
+    PROCESS_END = "process_end"
+    LOG_ENTRY = "log_entry"
+    CONNECTION = "connection"
+    HOST_CONTEXT = "host_context"
 
 
 @dataclass
@@ -36,7 +36,7 @@ class TelemetryEvent:
         payload:   Source-specific data.  Keys are documented by each source.
     """
 
-    type:      str
+    type: str
     timestamp: datetime
     source_id: str
-    payload:   Dict[str, Any] = field(default_factory=dict)
+    payload: dict[str, Any] = field(default_factory=dict)

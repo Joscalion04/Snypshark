@@ -1,5 +1,6 @@
-from collections import Counter, defaultdict
 import threading
+from collections import Counter, defaultdict
+
 from core.packet_processor import PacketProcessor
 
 
@@ -13,7 +14,7 @@ class UDPProcessor(PacketProcessor):
     def process_packet(self, packet) -> None:
         try:
             for layer in packet.layers:
-                if layer.layer_name == 'udp':
+                if layer.layer_name == "udp":
                     self._process_udp_layer(packet.udp)
                     break
         except (AttributeError, TypeError):
@@ -44,7 +45,7 @@ class UDPProcessor(PacketProcessor):
     def get_stats(self) -> dict:
         with self._lock:
             return {
-                'unique_ports': len(self._unique_ports),
-                'top_ports': dict(self.port_flows.most_common(10)),
-                'conversation_count': len(self._conversations),
+                "unique_ports": len(self._unique_ports),
+                "top_ports": dict(self.port_flows.most_common(10)),
+                "conversation_count": len(self._conversations),
             }

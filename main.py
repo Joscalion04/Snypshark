@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-import sys
 import os
+import sys
 import time
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'analyzer'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "analyzer"))
 
+from analytics.pandas_analyzer import PandasAnalyzer
 from core.analyzer import PCAPAnalyzer
-from processors.tcp_processor import TCPProcessor
-from processors.ip_processor import IPProcessor
-from processors.icmp_processor import ICMPProcessor
+from processors.dhcp_processor import DHCPProcessor
 from processors.dns_processor import DNSProcessor
 from processors.http_processor import HTTPProcessor
-from processors.dhcp_processor import DHCPProcessor
-from processors.udp_processor import UDPProcessor
+from processors.icmp_processor import ICMPProcessor
+from processors.ip_processor import IPProcessor
 from processors.pattern_processor import PatternProcessor
-from analytics.pandas_analyzer import PandasAnalyzer
+from processors.tcp_processor import TCPProcessor
+from processors.udp_processor import UDPProcessor
 from ui.cli_interface import InteractiveMenu
 from ui.osi_visualizer import OSIVisualizer
 from ui.progress_renderer import ProgressBar
-from utils.file_utils import validate_file_path, get_file_size
-from utils.performance_utils import optimize_memory_settings, get_system_info
+from utils.file_utils import get_file_size, validate_file_path
+from utils.performance_utils import get_system_info, optimize_memory_settings
 
 BANNER = """
     +-------------------------------------------------+
@@ -49,10 +49,10 @@ def get_file_path() -> str:
             print("Tip: You can drag and drop the file into the terminal.")
             continue
 
-        if not file_path.lower().endswith(('.pcap', '.pcapng')):
+        if not file_path.lower().endswith((".pcap", ".pcapng")):
             print("Warning: File extension is not .pcap or .pcapng")
             confirm = input("Continue anyway? (y/N): ").strip().lower()
-            if confirm != 'y':
+            if confirm != "y":
                 continue
 
         _, size_str = get_file_size(file_path)
@@ -75,16 +75,16 @@ def _show_pandas_summary(pandas_analyzer) -> None:
     print("PANDAS ANALYSIS SUMMARY")
     print("=" * 60)
 
-    overview = report.get('overview', {})
+    overview = report.get("overview", {})
     print(f"Total packets : {overview.get('total_packets', 0):,}")
     print(f"Total bytes   : {overview.get('total_bytes', 0):,}")
     print(f"Unique IPs    : {overview.get('unique_ips', 0)}")
     print(f"Duration      : {overview.get('time_duration', 'N/A')}")
 
-    anomalies = report.get('anomalies_detected', {})
-    if anomalies.get('total_anomalies', 0) > 0:
+    anomalies = report.get("anomalies_detected", {})
+    if anomalies.get("total_anomalies", 0) > 0:
         print(f"Anomalies     : {anomalies['total_anomalies']}")
-        for anomaly, count in anomalies.get('anomaly_types', {}).items():
+        for anomaly, count in anomalies.get("anomaly_types", {}).items():
             print(f"  {anomaly}: {count}")
 
     print("=" * 60)
@@ -118,15 +118,15 @@ def analyze_file(file_path: str):
     analyzer = PCAPAnalyzer(file_path)
 
     processors = {
-        'tcp':      TCPProcessor(),
-        'ip':       IPProcessor(),
-        'icmp':     ICMPProcessor(),
-        'dns':      DNSProcessor(),
-        'http':     HTTPProcessor(),
-        'dhcp':     DHCPProcessor(),
-        'udp':      UDPProcessor(),
-        'patterns': PatternProcessor(),
-        'pandas':   PandasAnalyzer(),
+        "tcp": TCPProcessor(),
+        "ip": IPProcessor(),
+        "icmp": ICMPProcessor(),
+        "dns": DNSProcessor(),
+        "http": HTTPProcessor(),
+        "dhcp": DHCPProcessor(),
+        "udp": UDPProcessor(),
+        "patterns": PatternProcessor(),
+        "pandas": PandasAnalyzer(),
     }
 
     for name, processor in processors.items():
@@ -143,12 +143,12 @@ def analyze_file(file_path: str):
     elapsed = time.time() - start_time
     print(f"Completed in {elapsed:.2f}s  ({total_packets / elapsed:.0f} packets/s)")
 
-    use_pandas = input("\nEnable advanced pandas analysis? (y/N): ").strip().lower() == 'y'
+    use_pandas = input("\nEnable advanced pandas analysis? (y/N): ").strip().lower() == "y"
 
     if use_pandas:
         print("\nBUILDING ADVANCED ANALYSIS")
         print("-" * 30)
-        pandas_analyzer = processors['pandas']
+        pandas_analyzer = processors["pandas"]
         pandas_analyzer.build_dataframes()
         _show_pandas_summary(pandas_analyzer)
     else:
@@ -178,6 +178,7 @@ def main() -> None:
     except Exception as e:
         print(f"\nUnexpected error: {e}")
         import traceback
+
         traceback.print_exc()
     finally:
         print("\n" + "=" * 60)
