@@ -1,5 +1,5 @@
 pyshark>=0.5.0
-pandas>=1.5.0
+pandas>=2.3.3
 numpy>=1.24.0
 openpyxl>=3.1.0
 psutil>=5.9.0
